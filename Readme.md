@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Владимир Крюков](https://up.htmlacademy.ru/javascript/11/user/18002).
-* Наставник: `Неизвестно`.
+* Наставник: [Дмитрий Харин](https://up.htmlacademy.ru/javascript/11/user/84972).
 
 ---
 
