@@ -368,7 +368,8 @@
   }
 
   toggleBlock('.map', '.map--faded');
-  var posts = getGeneratedPins(getGeneratedPosts(7));
+  var postsData = getGeneratedPosts(7);
+  var posts = getGeneratedPins(postsData);
   renderPins(posts);
-  addPostToMap('.map', createPost(posts[0]));
+  addPostToMap('.map', createPost(postsData[0]));
 })();
