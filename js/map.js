@@ -1,16 +1,17 @@
-(function() {
+'use strict';
+(function () {
   var LIST_TITLES = [
-    "Большая уютная квартира",
-    "Маленькая неуютная квартира",
-    "Огромный прекрасный дворец",
-    "Маленький ужасный дворец",
-    "Красивый гостевой домик",
-    "Некрасивый негостеприимный домик",
-    "Уютное бунгало далеко от моря",
-    "Неуютное бунгало по колено в воде"
+    'Большая уютная квартира',
+    'Маленькая неуютная квартира',
+    'Огромный прекрасный дворец',
+    'Маленький ужасный дворец',
+    'Красивый гостевой домик',
+    'Некрасивый негостеприимный домик',
+    'Уютное бунгало далеко от моря',
+    'Неуютное бунгало по колено в воде'
   ];
   var LIST_PHOTOS = [1, 2, 3, 4, 5, 6, 7, 8];
-  var LIST_FEATURES = ["wifi", "dishwasher", "parking", "washer", "elevator", "conditioner"];
+  var LIST_FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
   var LIST_CHECK_IN = ['12:00', '13:00', '14:00'];
   var LIST_CHECK_OUT = ['12:00', '13:00', '14:00'];
   var APARTMENT_TYPE_FLAT = 'flat';
@@ -21,8 +22,8 @@
   /**
    * Toggle для DOM'a.
    *
-   * @param selector
-   * @param className
+   * @param {Node} selector
+   * @param {string} className
    */
   function toggleBlock(selector, className) {
     className = className.replace('.', '');
@@ -33,7 +34,7 @@
    * Получить случайный элемент массива
    *
    * @param {[]} arr
-   * @returns {*}
+   * @return {*}
    */
   function getRandomArrayElement(arr) {
     return arr[getRandomArrayIndex(arr)];
@@ -43,7 +44,7 @@
    * Получить случайный индекс
    *
    * @param {[]} arr
-   * @returns {number}
+   * @return {number}
    */
   function getRandomArrayIndex(arr) {
     return Math.floor(Math.random() * arr.length);
@@ -54,7 +55,7 @@
    *
    * @param {int} min
    * @param {int} max
-   * @returns {number}
+   * @return {number}
    */
   function getRandom(min, max) {
     return Math.floor(Math.random() * (max - min) + min);
@@ -96,7 +97,7 @@
     var indexMax = getRandom(0, arr.length);
     if (indexMin > indexMax) {
       var swapIndex = indexMin;
-      indexMin = indexMax
+      indexMin = indexMax;
       indexMax = swapIndex;
     }
 
@@ -124,72 +125,72 @@
       var locationX = getRandom(300, 900);
       var locationY = getRandom(100, 500);
       var post = {
-        "author": {
+        'author': {
           /*
            строка, адрес изображения вида img/avatars/user{{xx}}.png, где xx это число от 1 до 8 с ведущим нулем.
            Например 01, 02 и т. д. Адреса изображений не повторяются
            */
-          "avatar": 'img/avatars/user0' + getRandomUniqueValues(avatarsCopy) + '.png'
+          'avatar': 'img/avatars/user0' + getRandomUniqueValues(avatarsCopy) + '.png'
         },
-        "offer": {
+        'offer': {
           /*
            строка, заголовок предложения, одно из фиксированных значений:
-           "Большая уютная квартира", "Маленькая неуютная квартира", "Огромный прекрасный дворец",
-           "Маленький ужасный дворец", "Красивый гостевой домик", "Некрасивый негостеприимный домик",
-           "Уютное бунгало далеко от моря", "Неуютное бунгало по колено в воде".
+           'Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец',
+           'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик',
+           'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'.
            Значения не должны повторяться.
            */
-          "title": getRandomUniqueValues(titlesCopy),
+          'title': getRandomUniqueValues(titlesCopy),
           /*
-           строка, адрес предложения, представляет собой запись вида "{{location.x}}, {{location.y}}"
+           строка, адрес предложения, представляет собой запись вида '{{location.x}}, {{location.y}}'
            */
-          "address": locationX + ', ' + locationY,
+          'address': locationX + ', ' + locationY,
           /*
-           * число, случайная цена от 1000 до 1 000 000
+           * число, случайная цена от 1000 до 1000000
            */
-          "price": getRandom(1000, 1000000),
+          'price': getRandom(1000, 1000000),
           /*
            строка с одним из трех фиксированных значений: flat, house или bungalo
            */
-          "type": getRandomArrayElement(LIST_APARTMENTS_TYPES),
+          'type': getRandomArrayElement(LIST_APARTMENTS_TYPES),
           /*
            число, случайное количество комнат от 1 до 5
            */
-          "rooms": getRandom(1, 5),
+          'rooms': getRandom(1, 5),
           /*
            число, случайное количество гостей, которое можно разместить
            */
-          "guests": getRandom(1, 20),
+          'guests': getRandom(1, 20),
           /*
            строка с одним из трех фиксированных значений: 12:00, 13:00 или 14:00,
            */
-          "checkin": getRandomArrayElement(LIST_CHECK_IN),
+          'checkin': getRandomArrayElement(LIST_CHECK_IN),
           /*
            строка с одним из трех фиксированных значений: 12:00, 13:00 или 14:00
            */
-          "checkout": getRandomArrayElement(LIST_CHECK_OUT),
+          'checkout': getRandomArrayElement(LIST_CHECK_OUT),
           /*
-           массив строк случайной длины из ниже предложенных: "wifi", "dishwasher", "parking", "washer", "elevator", "conditioner",
+           массив строк случайной длины из ниже предложенных: 'wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner',
            */
-          "features": getRandomFeatures(LIST_FEATURES),
+          'features': getRandomFeatures(LIST_FEATURES),
           /*
            пустая строка
            */
-          "description": '',
+          'description': '',
           /*
            пустой массив
            */
-          "photos": []
+          'photos': []
         },
-        "location": {
+        'location': {
           /*
            случайное число, координата x метки на карте в блоке .tokyo__pin-map от 300 до 900,
            */
-          "x": locationX,
+          'x': locationX,
           /*
            случайное число, координата y метки на карте в блоке .tokyo__pin-map от 100 до 500
            */
-          "y": locationY
+          'y': locationY
         }
       };
 
@@ -255,7 +256,7 @@
   /**
    * Получить название жилья по типу.
    *
-   * @param type
+   * @param {string} type
    * @return {string}
    */
   function getApartmentTitleByType(type) {
@@ -276,7 +277,7 @@
    *
    * @param {int} rooms
    * @param {int} guests
-   * @returns {string}
+   * @return {string}
    */
   function getGuestsAndRoomsDescription(rooms, guests) {
     return rooms + ' комнат' + (rooms > 1 ? 'ы' : 'a') + ' для ' + guests + ' гост' + (guests > 1 ? 'ей' : 'я');
@@ -334,7 +335,7 @@
    * Создать DOM для объявления.
    *
    * @param {{}} data
-   * @returns {Node}
+   * @return {Node}
    */
   function createPost(data) {
     var template = document.querySelector('template').content.querySelector('article.map__card');
