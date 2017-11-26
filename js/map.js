@@ -22,11 +22,10 @@
   /**
    * Toggle для DOM'a.
    *
-   * @param {Node} selector
+   * @param {string} selector
    * @param {string} className
    */
   function toggleBlock(selector, className) {
-    className = className.replace('.', '');
     document.querySelector(selector).classList.toggle(className);
   }
 
@@ -34,7 +33,7 @@
    * Получить случайный элемент массива
    *
    * @param {Array} arr
-   * @return {Array}
+   * @return {string}
    */
   function getRandomArrayElement(arr) {
     return arr[getRandomArrayIndex(arr)];
@@ -53,11 +52,14 @@
   /**
    * Получить случайное число
    *
-   * @param {number} min
    * @param {number} max
+   * @param {number} min
    * @return {number}
    */
-  function getRandom(min, max) {
+  function getRandom(max, min) {
+    if (min === undefined) {
+      min = 0;
+    }
     return Math.floor(Math.random() * (max - min) + min);
   }
 
@@ -75,12 +77,12 @@
 
 
   /**
-   * Получить случайные элементы массива(ов)
+   * Получить случайный уникальный элемент массива.
    *
    * @param {Array} arr Массив элементов
-   * @return {Array}
+   * @return {string}
    */
-  function getRandomUniqueValues(arr) {
+  function getRandomUniqueValue(arr) {
     return shuffleArray(arr).pop();
   }
 
@@ -130,7 +132,7 @@
            строка, адрес изображения вида img/avatars/user{{xx}}.png, где xx это число от 1 до 8 с ведущим нулем.
            Например 01, 02 и т. д. Адреса изображений не повторяются
            */
-          'avatar': 'img/avatars/user0' + getRandomUniqueValues(avatarsCopy) + '.png'
+          'avatar': 'img/avatars/user0' + getRandomUniqueValue(avatarsCopy) + '.png'
         },
         'offer': {
           /*
@@ -140,7 +142,7 @@
            'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'.
            Значения не должны повторяться.
            */
-          'title': getRandomUniqueValues(titlesCopy),
+          'title': getRandomUniqueValue(titlesCopy),
           /*
            строка, адрес предложения, представляет собой запись вида '{{location.x}}, {{location.y}}'
            */
@@ -304,7 +306,7 @@
     return (number).toLocaleString('ru-RU', {
       style: 'currency',
       currency: 'RUB'
-    });
+    }) + '/ночь';
   }
 
   /**
@@ -323,6 +325,36 @@
     }
 
     return fragment;
+  }
+
+  /**
+   * Обработать фичи.
+   *
+   * @param {Element} featuresList
+   * @param {Array} items
+   */
+  function processFeatures(featuresList, items) {
+    removeChildNodes(featuresList);
+    var features = getFeaturesList(items);
+    if (!features) {
+      return;
+    }
+    featuresList.appendChild(features);
+  }
+
+  /**
+   * Удалить все дочерние элементы у DOM ноды.
+   *
+   * @param {Element} node
+   */
+  function removeChildNodes(node) {
+    if (!node) {
+      return;
+    }
+
+    while (node.firstChild) {
+      node.removeChild(node.firstChild);
+    }
   }
 
   /**
@@ -352,7 +384,7 @@
     var price = post.querySelector('.popup__price');
     var type = post.querySelector('h4');
     var roomsAndGuests = post.querySelector('h4 + p');
-    var checkTime = post.querySelector('p:nth-of-type(3)');
+    var checkTime = post.querySelector('p:nth-of-type(4)');
     var featuresList = post.querySelector('.popup__features');
     var description = post.querySelector('.popup__features + p');
     var userAvatar = post.querySelector('.popup__avatar');
@@ -363,17 +395,14 @@
     type.textContent = getApartmentTitleByType(data.offer.type);
     roomsAndGuests.textContent = getGuestsAndRoomsDescription(data.offer.rooms, data.offer.guests);
     checkTime.textContent = getCheckTime(data.offer.checkin, data.offer.checkout);
-    var features = getFeaturesList(data.offer.features);
-    if (features) {
-      featuresList.appendChild(features);
-    }
+    processFeatures(featuresList, data.offer.features);
     description.textContent = data.offer.description;
     userAvatar.src = data.author.avatar;
 
     return post;
   }
 
-  toggleBlock('.map', '.map--faded');
+  toggleBlock('.map', 'map--faded');
   var postsData = getGeneratedPosts(7);
   var posts = getGeneratedPins(postsData);
   renderPins(posts);
