@@ -57,9 +57,7 @@
    * @return {number}
    */
   function getRandom(max, min) {
-    if (min === undefined) {
-      min = 0;
-    }
+    min = min || 0;
     return Math.floor(Math.random() * (max - min) + min);
   }
 
