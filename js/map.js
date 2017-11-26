@@ -93,23 +93,9 @@
    * @return {Array}
    */
   function getRandomFeatures(arr) {
-    var copiedArr = arr.slice();
-
-    var indexMin = getRandom(0, arr.length);
-    var indexMax = getRandom(0, arr.length);
-    if (indexMin > indexMax) {
-      var swapIndex = indexMin;
-      indexMin = indexMax;
-      indexMax = swapIndex;
-    }
-
-    var shuffledFeatures = shuffleArray(copiedArr);
-    var randomFeatures = shuffleArray(copiedArr).splice(indexMin, indexMax);
-    if (!randomFeatures.length) {
-      return shuffledFeatures.splice(0, 1);
-    }
-
-    return randomFeatures;
+    return shuffleArray(arr).filter(function (element, index) {
+      return index <= Math.ceil(Math.random() * arr.length);
+    });
   }
 
   /**
