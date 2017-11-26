@@ -33,8 +33,8 @@
   /**
    * Получить случайный элемент массива
    *
-   * @param {[]} arr
-   * @return {*}
+   * @param {Array} arr
+   * @return {Array}
    */
   function getRandomArrayElement(arr) {
     return arr[getRandomArrayIndex(arr)];
@@ -43,7 +43,7 @@
   /**
    * Получить случайный индекс
    *
-   * @param {[]} arr
+   * @param {Array} arr
    * @return {number}
    */
   function getRandomArrayIndex(arr) {
@@ -53,8 +53,8 @@
   /**
    * Получить случайное число
    *
-   * @param {int} min
-   * @param {int} max
+   * @param {number} min
+   * @param {number} max
    * @return {number}
    */
   function getRandom(min, max) {
@@ -64,8 +64,8 @@
   /**
    * Перемешать массив.
    *
-   * @param {[]} arr
-   * @return {[]}
+   * @param {Array} arr
+   * @return {Array}
    */
   function shuffleArray(arr) {
     return arr.sort(function () {
@@ -77,8 +77,8 @@
   /**
    * Получить случайные элементы массива(ов)
    *
-   * @param {[]} arr Массив элементов
-   * @return {[]}
+   * @param {Array} arr Массив элементов
+   * @return {Array}
    */
   function getRandomUniqueValues(arr) {
     return shuffleArray(arr).pop();
@@ -87,8 +87,8 @@
   /**
    * Получить случайный список фич.
    *
-   * @param {[]} arr
-   * @return {[]}
+   * @param {Array} arr
+   * @return {Array}
    */
   function getRandomFeatures(arr) {
     var copiedArr = arr.slice();
@@ -113,8 +113,8 @@
   /**
    * Сгенерировать фейковые объявления
    *
-   * @param {int} amount Кол-во
-   * @return {[]}
+   * @param {number} amount Кол-во
+   * @return {Array}
    */
   function getGeneratedPosts(amount) {
     var avatarsCopy = LIST_PHOTOS.slice();
@@ -203,8 +203,8 @@
   /**
    * Сгенерировать Dom'ы для Pin'ов на карте.
    *
-   * @param {[]} data
-   * @return {[]}
+   * @param {Array} data
+   * @return {Array}
    */
   function getGeneratedPins(data) {
     var elements = [];
@@ -218,8 +218,8 @@
   /**
    * Создать Pin кнопку для карты.
    *
-   * @param {[]} data
-   * @param {int} i
+   * @param {Array} data
+   * @param {number} i
    * @return {Element}
    */
   function getPin(data, i) {
@@ -242,7 +242,7 @@
   /**
    * Отрендерить Pin'ы на карте.
    *
-   * @param {[]} pins
+   * @param {Array} pins
    */
   function renderPins(pins) {
     var pinContainer = document.querySelector('.map__pins');
@@ -275,8 +275,8 @@
   /**
    * Кол-во комнат и гостей.
    *
-   * @param {int} rooms
-   * @param {int} guests
+   * @param {number} rooms
+   * @param {number} guests
    * @return {string}
    */
   function getGuestsAndRoomsDescription(rooms, guests) {
@@ -286,15 +286,21 @@
   /**
    * Время чекина.
    *
-   * @param {int} timeIn
-   * @param {int} timeOut
+   * @param {number} timeIn
+   * @param {number} timeOut
    * @return {string}
    */
   function getCheckTime(timeIn, timeOut) {
     return 'Заезд после ' + timeIn + ', выезд до ' + timeOut;
   }
 
-  function getPrice(number) {
+  /**
+   * Отформатировать прайс.
+   *
+   * @param {string} number
+   * @return {string}
+   */
+  function getFormattedPrice(number) {
     return (number).toLocaleString('ru-RU', {
       style: 'currency',
       currency: 'RUB'
@@ -304,7 +310,7 @@
   /**
    * Сгенерировать DOM список фич.
    *
-   * @param {[]} featuresList
+   * @param {Array} featuresList
    * @return {DocumentFragment}
    */
   function getFeaturesList(featuresList) {
@@ -334,7 +340,7 @@
   /**
    * Создать DOM для объявления.
    *
-   * @param {{}} data
+   * @param {Object[]} data
    * @return {Node}
    */
   function createPost(data) {
@@ -353,7 +359,7 @@
 
     title.textContent = data.offer.title;
     address.textContent = data.offer.address;
-    price.textContent = getPrice(data.offer.price);
+    price.textContent = getFormattedPrice(data.offer.price);
     type.textContent = getApartmentTitleByType(data.offer.type);
     roomsAndGuests.textContent = getGuestsAndRoomsDescription(data.offer.rooms, data.offer.guests);
     checkTime.textContent = getCheckTime(data.offer.checkin, data.offer.checkout);
