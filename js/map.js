@@ -92,7 +92,7 @@
    */
   function getRandomFeatures(arr) {
     return shuffleArray(arr).filter(function (element, index) {
-      return index <= Math.ceil(Math.random() * arr.length);
+      return 0.5 > Math.random();
     });
   }
 
