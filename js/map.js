@@ -91,8 +91,8 @@
    * @return {Array}
    */
   function getRandomFeatures(arr) {
-    return shuffleArray(arr).filter(function (element, index) {
-      return 0.5 > Math.random();
+    return shuffleArray(arr).filter(function () {
+      return Math.random() < 0.5;
     });
   }
 
