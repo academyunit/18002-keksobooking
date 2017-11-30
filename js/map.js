@@ -1,5 +1,8 @@
 'use strict';
 (function () {
+  var KEYBOARD_KEY_ENTER = 13;
+  var KEYBOARD_KEY_ESC = 27;
+
   var LIST_TITLES = [
     'Большая уютная квартира',
     'Маленькая неуютная квартира',
@@ -18,16 +21,6 @@
   var APARTMENT_TYPE_HOUSE = 'house';
   var APARTMENT_TYPE_BUNGALO = 'bungalo';
   var LIST_APARTMENTS_TYPES = [APARTMENT_TYPE_FLAT, APARTMENT_TYPE_HOUSE, APARTMENT_TYPE_BUNGALO];
-
-  /**
-   * Toggle для DOM'a.
-   *
-   * @param {string} selector
-   * @param {string} className
-   */
-  function toggleBlock(selector, className) {
-    document.querySelector(selector).classList.toggle(className);
-  }
 
   /**
    * Получить случайный элемент массива
@@ -213,6 +206,7 @@
     pinButton.style.left = data[i].location.x + 'px';
     pinButton.style.top = data[i].location.y + 'px';
     pinButton.className = 'map__pin';
+    pinButton.tabIndex = 0;
 
     var pinImage = document.createElement('img');
     pinImage.src = data[i].author.avatar;
@@ -223,6 +217,15 @@
     pinButton.appendChild(pinImage);
 
     return pinButton;
+  }
+
+  /**
+   * Удалить все Pin с карты.
+   *
+   * @param {Element} pinsContainer
+   */
+  function removePins(pinsContainer) {
+    removeChildNodes(pinsContainer, 2);
   }
 
   /**
@@ -330,27 +333,16 @@
    * Удалить все дочерние элементы у DOM ноды.
    *
    * @param {Element} node
+   * @param {number} startPosition
    */
-  function removeChildNodes(node) {
+  function removeChildNodes(node, startPosition) {
     if (!node) {
       return;
     }
 
-    while (node.firstChild) {
-      node.removeChild(node.firstChild);
+    while (node.children[startPosition]) {
+      node.removeChild(node.children[startPosition]);
     }
-  }
-
-  /**
-   * Добавить объявление на карту.
-   *
-   * @param {string} map
-   * @param {Node} post
-   */
-  function addPostToMap(map, post) {
-    var mapContainer = document.querySelector(map);
-
-    mapContainer.appendChild(post);
   }
 
   /**
@@ -386,9 +378,278 @@
     return post;
   }
 
-  toggleBlock('.map', 'map--faded');
-  var postsData = getGeneratedPosts(7);
-  var posts = getGeneratedPins(postsData);
-  renderPins(posts);
-  addPostToMap('.map', createPost(postsData[0]));
+  /**
+   * Нажат ENTER?
+   *
+   * @param {Event} e
+   * @return {boolean}
+   */
+  function isKeyboardEnterKey(e) {
+    return KEYBOARD_KEY_ENTER === e.keyCode;
+  }
+
+  /**
+   * Нажат ESC?
+   *
+   * @param {Event} e
+   * @return {boolean}
+   */
+  function isKeyboardEscKey(e) {
+    return KEYBOARD_KEY_ESC === e.keyCode;
+  }
+
+  initInterface();
+
+  /**
+   * Инициализация интерфейса.
+   */
+  function initInterface() {
+    var map = document.querySelector('.map');
+    var form = document.querySelector('.notice__form');
+    var pinMain = map.querySelector('.map__pin--main');
+    var pinsContainer = map.querySelector('.map__pins');
+
+    var postData = [];
+
+    // Отключить инпуты в форме
+    toggleFormInputs(form);
+
+    // Инициализация интерфейса с картой
+    pinMain.addEventListener('mouseup', function () {
+      // Включить инпуты в форме
+      toggleFormInputs(form);
+      // Активировать карту
+      toggleMap();
+      // Удаляем старые Pin'ы
+      removePins(pinsContainer);
+      // Показать метки похожих объявлений
+      showPins();
+      // Активировать форму
+      toggleForm();
+    });
+
+    /**
+     * Следим за всеми Pin на карте по клику.
+     */
+    pinsContainer.addEventListener('click', function (e) {
+      var target = e.target;
+      if (target.tagName.toLowerCase() !== 'img' || !target.parentNode.classList.contains('map__pin')) {
+        return;
+      }
+      if (target.parentNode.classList.contains('map__pin')) {
+        target = target.parentNode;
+      }
+
+      processPin(target);
+    });
+
+    /**
+     * Следим за всеми Pin на карте по нажатию ENTER.
+     */
+    pinsContainer.addEventListener('keydown', function (e) {
+      if (isKeyboardEnterKey(e)) {
+        pinClickHandler(e);
+      }
+    });
+
+    /**
+     * Handler клика на Pin.
+     *
+     * @param {Event} e
+     */
+    function pinClickHandler(e) {
+      var target = e.target;
+      if (!target.classList.contains('map__pin')) {
+        return;
+      }
+
+      processPin(target);
+    }
+
+    /**
+     * Логика обработки нажатия на Pin а карте.
+     *
+     * @param {EventTarget} pin
+     */
+    function processPin(pin) {
+      // Почистить DOM от старых попапов
+      removePopups();
+      // Деактивировать все ранее активированные Pin'ы
+      deactivatePins();
+      // Текущий Pin ктивировать
+      activatePin(pin);
+
+      // Создать на его основе попап слева
+      createPopUpWindow(pin);
+
+      // Повесить на document handler закрытия попапа по ESC
+      registerPopUpWindowListener();
+    }
+
+    /**
+     * Закрытие поапа по нажатию ESC в document'e
+     */
+    function registerPopUpWindowListener() {
+      document.addEventListener('keydown', closePopUpByEscHandler);
+    }
+
+    /**
+     * Удалить handler акрытия попапа по нажатию ESC в document'e
+     */
+    function unregisterPopUpWindowListener() {
+      document.removeEventListener('keydown', closePopUpByEscHandler);
+    }
+
+    /**
+     * Закрыть попап.
+     *
+     * @param {Event} e
+     */
+    function closePopUpByEscHandler(e) {
+      if (isKeyboardEscKey(e)) {
+        removePopups();
+        deactivatePins();
+      }
+    }
+
+    /**
+     * Создать попап.
+     *
+     * @param {Element} pin
+     */
+    function createPopUpWindow(pin) {
+      var coordinateX = parseInt(pin.style.left, 10);
+      var coordinateY = parseInt(pin.style.top, 10);
+
+      // Находим данные для шаблона в массиве Pin'ов по коордиинатам х и у
+      var postInfo = getPostByXandYlocation(coordinateX, coordinateY);
+      // Создаем попап из шаблона
+      var popupWindow = createPost(postInfo);
+      var popupWindowCloseButton = popupWindow.querySelector('.popup__close');
+
+      // Вешаем handler'ы на закрытие по клику и ENTER
+      popupWindowCloseButton.addEventListener('click', popUpCloseHandler);
+      popupWindowCloseButton.addEventListener('keydown', function (e) {
+        if (isKeyboardEnterKey(e)) {
+          popUpCloseHandler();
+        }
+      });
+
+
+      addPopUpWindowToMap(popupWindow);
+    }
+
+    /**
+     * Handler закрытия попапа.
+     */
+    function popUpCloseHandler() {
+      removePopups();
+      deactivatePins();
+    }
+
+    /**
+     * Найти пост по координатам x + y.
+     * @param {number} x
+     * @param {number} y
+     * @return {Array}
+     */
+    function getPostByXandYlocation(x, y) {
+      for (var i = 0; i < postData.length; i++) {
+        if (postData[i].location.x === x && postData[i].location.y === y) {
+          return postData[i];
+        }
+      }
+
+      return [];
+    }
+
+    /**
+     * Сгенерировать и показать все Pin на карте.
+     */
+    function showPins() {
+      postData = getGeneratedPosts(7);
+      var posts = getGeneratedPins(postData);
+
+      renderPins(posts);
+    }
+
+    /**
+     * enable/disable для инпутво формы
+     */
+    function toggleFormInputs() {
+      Array.from(form).forEach(function (element) {
+        if (element.tagName.toLowerCase() !== 'fieldset') {
+          return;
+        }
+        element.disabled = !element.disabled;
+      });
+    }
+
+    /**
+     * enable/disable для формы
+     */
+    function toggleForm() {
+      form.classList.toggle('notice__form--disabled');
+    }
+
+    /**
+     * enable/disable для карты
+     */
+    function toggleMap() {
+      map.classList.toggle('map--faded');
+    }
+
+    /**
+     * Выключить подсветку у всех Pin
+     */
+    function deactivatePins() {
+      Array.from(pinsContainer.children).forEach(function (pin) {
+        deactivatePin(pin);
+      });
+    }
+
+    /**
+     * Удалить все попапы из DOM'a
+     */
+    function removePopups() {
+      Array.from(map.children).forEach(function (item) {
+        if (item.classList.contains('popup')) {
+          item.remove();
+        }
+      });
+
+      // Удалить handler закрытия попапов по ESC
+      unregisterPopUpWindowListener();
+    }
+
+    /**
+     * Выключить подсветку для Pin.
+     *
+     * @param {Element} pin
+     */
+    function deactivatePin(pin) {
+      if (!pin.classList.contains('map__pin')) {
+        return;
+      }
+      pin.classList.remove('map__pin--active');
+    }
+
+    /**
+     * Включить подсветку для Pin.
+     *
+     * @param {Element} pin
+     */
+    function activatePin(pin) {
+      pin.classList.add('map__pin--active');
+    }
+
+    /**
+     * Добавить объявление на карту.
+     *
+     * @param {Element} post
+     */
+    function addPopUpWindowToMap(post) {
+      map.appendChild(post);
+    }
+  }
 })();
