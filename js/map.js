@@ -95,7 +95,7 @@
    * @param {number} amount Кол-во
    * @return {Array}
    */
-  function getGeneratedPosts(amount) {
+  function getPosts(amount) {
     var avatarsCopy = LIST_PHOTOS.slice();
     var titlesCopy = LIST_TITLES.slice();
 
@@ -104,12 +104,13 @@
       var locationX = getRandom(300, 900);
       var locationY = getRandom(100, 500);
       var post = {
+        'id': getPinId(locationX, locationY),
         'author': {
           /*
            строка, адрес изображения вида img/avatars/user{{xx}}.png, где xx это число от 1 до 8 с ведущим нулем.
            Например 01, 02 и т. д. Адреса изображений не повторяются
            */
-          'avatar': 'img/avatars/user0' + getRandomUniqueValue(avatarsCopy) + '.png'
+          'avatar': getAvatar(getRandomUniqueValue(avatarsCopy))
         },
         'offer': {
           /*
@@ -123,7 +124,7 @@
           /*
            строка, адрес предложения, представляет собой запись вида '{{location.x}}, {{location.y}}'
            */
-          'address': locationX + ', ' + locationY,
+          'address': getAddressCoordinates(locationX, locationY),
           /*
            * число, случайная цена от 1000 до 1000000
            */
@@ -180,36 +181,42 @@
   }
 
   /**
-   * Сгенерировать Dom'ы для Pin'ов на карте.
+   * Получить ссылку на аватар пользователя.
    *
-   * @param {Array} data
-   * @return {Array}
+   * @param {number} number
+   * @return {string}
    */
-  function getGeneratedPins(data) {
-    var elements = [];
-    for (var i = 0; i < data.length; i++) {
-      elements.push(getPin(data, i));
-    }
+  function getAvatar(number) {
+    return 'img/avatars/user0' + number + '.png';
+  }
 
-    return elements;
+  /**
+   * Получить отформатированную строку координат.
+   *
+   * @param {number} locationX
+   * @param {number} locationY
+   * @return {string}
+   */
+  function getAddressCoordinates(locationX, locationY) {
+    return locationX + ', ' + locationY;
   }
 
   /**
    * Создать Pin кнопку для карты.
    *
    * @param {Array} data
-   * @param {number} i
    * @return {Element}
    */
-  function getPin(data, i) {
+  function getPin(data) {
     var pinButton = document.createElement('button');
-    pinButton.style.left = data[i].location.x + 'px';
-    pinButton.style.top = data[i].location.y + 'px';
+    pinButton.style.left = data.location.x + 'px';
+    pinButton.style.top = data.location.y + 'px';
     pinButton.className = 'map__pin';
     pinButton.tabIndex = 0;
+    pinButton.dataset.id = getPinId(data.location.x, data.location.y);
 
     var pinImage = document.createElement('img');
-    pinImage.src = data[i].author.avatar;
+    pinImage.src = data.author.avatar;
     pinImage.width = 40;
     pinImage.height = 40;
     pinImage.dragable = false;
@@ -220,12 +227,22 @@
   }
 
   /**
+   * Получить ID Pin'a.
+   * @param {number} x
+   * @param {number} y
+   * @return {number}
+   */
+  function getPinId(x, y) {
+    return parseInt(x + y, 10);
+  }
+
+  /**
    * Удалить все Pin с карты.
    *
    * @param {Element} pinsContainer
    */
   function removePins(pinsContainer) {
-    removeChildNodes(pinsContainer, 2);
+    removeChildNodes(pinsContainer, ['map__pinsoverlay', 'map__pin--main']);
   }
 
   /**
@@ -237,7 +254,7 @@
     var pinContainer = document.querySelector('.map__pins');
     var fragment = document.createDocumentFragment();
     for (var i = 0; i < pins.length; i++) {
-      fragment.appendChild(pins[i]);
+      fragment.appendChild(getPin(pins[i]));
     }
     pinContainer.appendChild(fragment);
   }
@@ -321,7 +338,7 @@
    * @param {Array} items
    */
   function processFeatures(featuresList, items) {
-    removeChildNodes(featuresList);
+    removeChildNodes(featuresList, ['map__pinsoverlay', 'map__pin--main']);
     var features = getFeaturesList(items);
     if (!features) {
       return;
@@ -333,16 +350,43 @@
    * Удалить все дочерние элементы у DOM ноды.
    *
    * @param {Element} node
-   * @param {number} startPosition
+   * @param {Array} ignoreClasses
    */
-  function removeChildNodes(node, startPosition) {
+  function removeChildNodes(node, ignoreClasses) {
     if (!node) {
       return;
     }
+    ignoreClasses = ignoreClasses || [];
 
-    while (node.children[startPosition]) {
-      node.removeChild(node.children[startPosition]);
+    var currentIndex = 0;
+    while (node.children[currentIndex]) {
+      if (hasClass(node.children[currentIndex], ignoreClasses)) {
+        currentIndex++;
+        continue;
+      }
+      node.removeChild(node.children[currentIndex]);
     }
+  }
+
+  /**
+   * Хелпер проверяет есть ли у element'a нужные классы.
+   *
+   * @param {Element} element
+   * @param {Array} classList
+   * @return {boolean}
+   */
+  function hasClass(element, classList) {
+    var found = false;
+
+    classList.forEach(function (className) {
+      if (element.className.indexOf(className) > -1) {
+        found = true;
+        return false;
+      }
+      return true;
+    });
+
+    return found;
   }
 
   /**
@@ -398,8 +442,6 @@
     return KEYBOARD_KEY_ESC === e.keyCode;
   }
 
-  initInterface();
-
   /**
    * Инициализация интерфейса.
    */
@@ -408,14 +450,12 @@
     var form = document.querySelector('.notice__form');
     var pinMain = map.querySelector('.map__pin--main');
     var pinsContainer = map.querySelector('.map__pins');
+    var postData = getPosts(7);
 
-    var postData = [];
-
-    // Отключить инпуты в форме
-    toggleFormInputs(form);
-
-    // Инициализация интерфейса с картой
-    pinMain.addEventListener('mouseup', function () {
+    /**
+     * Обработчик клика по красному маркеру.
+     */
+    function mainPinClickHandler() {
       // Включить инпуты в форме
       toggleFormInputs(form);
       // Активировать карту
@@ -423,55 +463,32 @@
       // Удаляем старые Pin'ы
       removePins(pinsContainer);
       // Показать метки похожих объявлений
-      showPins();
+      renderPins(postData);
+      //
+      registerPinsHandlers();
       // Активировать форму
       toggleForm();
-    });
 
-    /**
-     * Следим за всеми Pin на карте по клику.
-     */
-    pinsContainer.addEventListener('click', function (e) {
-      var target = e.target;
-      if (target.tagName.toLowerCase() !== 'img' || !target.parentNode.classList.contains('map__pin')) {
-        return;
-      }
-      if (target.parentNode.classList.contains('map__pin')) {
-        target = target.parentNode;
-      }
+      pinMain.removeEventListener('mouseup', mainPinClickHandler);
+    }
 
-      processPin(target);
-    });
-
-    /**
-     * Следим за всеми Pin на карте по нажатию ENTER.
-     */
-    pinsContainer.addEventListener('keydown', function (e) {
-      if (isKeyboardEnterKey(e)) {
-        pinClickHandler(e);
-      }
-    });
-
-    /**
-     * Handler клика на Pin.
-     *
-     * @param {Event} e
-     */
-    function pinClickHandler(e) {
-      var target = e.target;
-      if (!target.classList.contains('map__pin')) {
-        return;
-      }
-
-      processPin(target);
+    function registerPinsHandlers() {
+      var pinsList = map.querySelectorAll('.map__pin');
+      pinsList.forEach(function (pin) {
+        if (!pin.classList.contains('map__pin--main')) {
+          pin.addEventListener('click', processPin);
+        }
+      });
     }
 
     /**
-     * Логика обработки нажатия на Pin а карте.
+     * Логика обработки нажатия на Pin на карте.
      *
-     * @param {EventTarget} pin
+     * @param {Event} e
      */
-    function processPin(pin) {
+    function processPin(e) {
+      var pin = e.currentTarget;
+
       // Почистить DOM от старых попапов
       removePopups();
       // Деактивировать все ранее активированные Pin'ы
@@ -490,14 +507,14 @@
      * Закрытие поапа по нажатию ESC в document'e
      */
     function registerPopUpWindowListener() {
-      document.addEventListener('keydown', closePopUpByEscHandler);
+      document.addEventListener('keydown', keyDownHandler);
     }
 
     /**
      * Удалить handler акрытия попапа по нажатию ESC в document'e
      */
     function unregisterPopUpWindowListener() {
-      document.removeEventListener('keydown', closePopUpByEscHandler);
+      document.removeEventListener('keydown', keyDownHandler);
     }
 
     /**
@@ -505,7 +522,7 @@
      *
      * @param {Event} e
      */
-    function closePopUpByEscHandler(e) {
+    function keyDownHandler(e) {
       if (isKeyboardEscKey(e)) {
         removePopups();
         deactivatePins();
@@ -518,11 +535,8 @@
      * @param {Element} pin
      */
     function createPopUpWindow(pin) {
-      var coordinateX = parseInt(pin.style.left, 10);
-      var coordinateY = parseInt(pin.style.top, 10);
-
-      // Находим данные для шаблона в массиве Pin'ов по коордиинатам х и у
-      var postInfo = getPostByXandYlocation(coordinateX, coordinateY);
+      // Ищем Pin по его ID
+      var postInfo = findPinById(pin.dataset.id);
       // Создаем попап из шаблона
       var popupWindow = createPost(postInfo);
       var popupWindowCloseButton = popupWindow.querySelector('.popup__close');
@@ -535,8 +549,23 @@
         }
       });
 
-
       addPopUpWindowToMap(popupWindow);
+    }
+
+    /**
+     * Найти Pin по его ID.
+     *
+     * @param {number} id
+     * @return {Array}
+     */
+    function findPinById(id) {
+      for (var i = 0; i < postData.length; i++) {
+        if (parseInt(postData[i].id, 10) === parseInt(id, 10)) {
+          return postData[i];
+        }
+      }
+
+      return [];
     }
 
     /**
@@ -548,33 +577,7 @@
     }
 
     /**
-     * Найти пост по координатам x + y.
-     * @param {number} x
-     * @param {number} y
-     * @return {Array}
-     */
-    function getPostByXandYlocation(x, y) {
-      for (var i = 0; i < postData.length; i++) {
-        if (postData[i].location.x === x && postData[i].location.y === y) {
-          return postData[i];
-        }
-      }
-
-      return [];
-    }
-
-    /**
-     * Сгенерировать и показать все Pin на карте.
-     */
-    function showPins() {
-      postData = getGeneratedPosts(7);
-      var posts = getGeneratedPins(postData);
-
-      renderPins(posts);
-    }
-
-    /**
-     * enable/disable для инпутво формы
+     * enable/disable для инпута формы
      */
     function toggleFormInputs() {
       Array.from(form).forEach(function (element) {
@@ -651,5 +654,12 @@
     function addPopUpWindowToMap(post) {
       map.appendChild(post);
     }
+
+    // Отключить инпуты в форме
+    toggleFormInputs(form);
+    // Инициализация интерфейса с картой
+    pinMain.addEventListener('mouseup', mainPinClickHandler);
   }
+
+  initInterface();
 })();
