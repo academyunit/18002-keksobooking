@@ -350,19 +350,21 @@
 
     var children = Array.prototype.slice.call(node.children);
     children.forEach(function (childNode) {
-      var skipElement = false;
-      skipClasses.forEach(function (currentClass) {
-        if (childNode.classList.contains(currentClass)) {
-          skipElement = true;
+      if (skipClasses) {
+        var skipElement = false;
+        skipClasses.forEach(function (currentClass) {
+          if (childNode.classList.contains(currentClass)) {
+            skipElement = true;
 
-          return false;
+            return false;
+          }
+
+          return true;
+        });
+
+        if (skipElement) {
+          return;
         }
-
-        return true;
-      });
-
-      if (skipElement) {
-        return;
       }
       childNode.remove();
     });
@@ -640,5 +642,152 @@
     pinMain.addEventListener('mouseup', mainPinClickHandler);
   }
 
+  function initFormHandlers() {
+    var form = document.querySelector('.notice__form');
+    var address = form.querySelector('#address');
+    var title = form.querySelector('#title');
+
+    var timeIn = form.querySelector('#timein');
+    var timeOut = form.querySelector('#timeout');
+    var type = form.querySelector('#type');
+    var price = form.querySelector('#price');
+    var roomNumber = form.querySelector('#room_number');
+    var capacity = form.querySelector('#capacity');
+
+    function initValidators() {
+      var TITLE_MIN_LENGTH = 30;
+      var TITLE_MAX_LENGTH = 100;
+      var PRICE_MIN = 0;
+      var PRICE_MAX = 1000000;
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+      });
+
+      address.addEventListener('invalid', function() {
+        this.setCustomValidity('');
+        highlightInput(this, true);
+        if (this.validity.valueMissing) {
+          this.setCustomValidity('Обязательное поле');
+          highlightInput(this);
+        }
+      });
+
+      title.addEventListener('invalid', function() {
+        this.setCustomValidity('');
+        highlightInput(this, true);
+        if (this.validity.valueMissing) {
+          this.setCustomValidity('Обязательное поле');
+          highlightInput(this);
+        }
+        if (this.validity.tooShort) {
+          this.setCustomValidity('Минимальное количество символов - ' + TITLE_MIN_LENGTH);
+          highlightInput(this);
+        }
+        if (this.validity.tooLong) {
+          this.setCustomValidity('Максимальное количество символов - ' + TITLE_MAX_LENGTH);
+          highlightInput(this);
+        }
+      });
+
+      price.addEventListener('invalid', function(e) {
+        this.setCustomValidity('');
+        if (this.validity.typeMismatch) {
+          this.setCustomValidity('Цена должна быть числом!');
+        }
+        if (this.validity.valueMissing) {
+          this.setCustomValidity('Обязательное поле');
+        }
+      });
+
+      price.addEventListener('input', function(e) {
+        var target = e.target;
+
+        highlightInput(target, true);
+        target.setCustomValidity('');
+        if (isNaN(target.value)) {
+          target.setCustomValidity('В данном поле допустимы только цифры!');
+          highlightInput(target);
+        }
+        if (target.value < PRICE_MIN) {
+          target.setCustomValidity('Минимальная цена - ' + PRICE_MIN);
+          highlightInput(target);
+        }
+        if (target.value > PRICE_MAX) {
+          target.setCustomValidity('Максимальная цена - ' + PRICE_MAX);
+          highlightInput(target);
+        }
+      });
+
+      function highlightInput(input, revertChanges) {
+        if (revertChanges) {
+          input.style.border = '';
+          return;
+        }
+        input.style.border = '2px solid red';
+      }
+    }
+
+    function initRelatedFieldsHandlers() {
+      var formFieldsRelation = {
+        apartments: {
+          bungalo: 0,
+          flat: 1000,
+          house: 5000,
+          palace: 10000
+        },
+        rooms: {
+          1: [1],
+          2: [1, 2],
+          3: [1, 2, 3],
+          100: [0]
+        }
+      };
+
+      timeIn.addEventListener('change', function() {
+        timeOut.value = this.value;
+      });
+
+      type.addEventListener('change', function() {
+        price.value = formFieldsRelation['apartments'][this.value]
+      });
+
+      var allCapacityOptions = Array.prototype.slice.call(capacity.cloneNode(true).children);
+      roomNumber.addEventListener('change', function() {
+        if (!this.value) {
+          return;
+        }
+        var allowedOptions = formFieldsRelation['rooms'][this.value];
+        removeChildNodes(capacity);
+
+        allCapacityOptions
+          .filter(function(option) {
+            return allowedOptions.indexOf(parseInt(option.value, 10)) > -1;
+          })
+          .forEach(function(item) {
+            capacity.appendChild(item);
+          })
+        ;
+
+        /*
+         // Почему такое не работает?
+         var filteredOptions = Array.prototype.filter.call(allCapacityOptions, function(option) {
+         return (allowedOptions.indexOf(parseInt(option.value, 10)) > -1);
+         });
+
+         // Вот если этот кусок оставить раскомментированным, то он элементы из allCapacityOptions начинают пропадать o_O aaaaa
+         filteredOptions.forEach(function(option) {
+         console.log('append', option);
+         capacity.appendChild(option);
+         });
+         */
+      });
+    }
+
+    initValidators();
+    initRelatedFieldsHandlers();
+  }
+
   initInterface();
+  initFormHandlers();
 })();
