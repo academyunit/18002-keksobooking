@@ -694,6 +694,14 @@
         if (price.validity.valueMissing) {
           price.setCustomValidity('Обязательное поле');
         }
+        if (price.validity.rangeUnderflow) {
+          price.setCustomValidity('Минимальная цена - ' + PRICE_MIN);
+          highlightInput(price);
+        }
+        if (price.validity.rangeOverflow) {
+          price.setCustomValidity('Максимальная цена - ' + PRICE_MAX);
+          highlightInput(price);
+        }
       });
 
       price.addEventListener('input', function (e) {
@@ -703,14 +711,6 @@
         target.setCustomValidity('');
         if (isNaN(target.value)) {
           target.setCustomValidity('В данном поле допустимы только цифры!');
-          highlightInput(target);
-        }
-        if (target.value < PRICE_MIN) {
-          target.setCustomValidity('Минимальная цена - ' + PRICE_MIN);
-          highlightInput(target);
-        }
-        if (target.value > PRICE_MAX) {
-          target.setCustomValidity('Максимальная цена - ' + PRICE_MAX);
           highlightInput(target);
         }
       });
@@ -748,7 +748,8 @@
         price.value = formFieldsRelation['apartments'][type.value];
       });
 
-      var allCapacityOptions = Array.prototype.slice.call(capacity.cloneNode(true).children);
+      // var allCapacityOptions = capacity.cloneNode(true).children;
+      var allCapacityOptions = Array.prototype.slice.call(capacity);
       roomNumber.addEventListener('change', function () {
         if (!roomNumber.value) {
           return;
@@ -770,7 +771,7 @@
          return (allowedOptions.indexOf(parseInt(option.value, 10)) > -1);
          });
 
-         // Вот если этот кусок оставить раскомментированным, то он элементы из allCapacityOptions начинают пропадать o_O aaaaa
+         // Вот если этот кусок оставить раскомментированным, то он элементы из allCapacityOptions (того, что выше тоже закоменчен) начинают пропадать o_O aaaaa
          filteredOptions.forEach(function(option) {
          console.log('append', option);
          capacity.appendChild(option);
