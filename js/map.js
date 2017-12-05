@@ -104,7 +104,7 @@
       var locationX = getRandom(300, 900);
       var locationY = getRandom(100, 500);
       var post = {
-        'id': getPinId(locationX, locationY),
+        'id': i,
         'author': {
           /*
            строка, адрес изображения вида img/avatars/user{{xx}}.png, где xx это число от 1 до 8 с ведущим нулем.
@@ -213,7 +213,7 @@
     pinButton.style.top = data.location.y + 'px';
     pinButton.className = 'map__pin';
     pinButton.tabIndex = 0;
-    pinButton.dataset.id = getPinId(data.location.x, data.location.y);
+    pinButton.dataset.id = data.id;
 
     var pinImage = document.createElement('img');
     pinImage.src = data.author.avatar;
@@ -224,16 +224,6 @@
     pinButton.appendChild(pinImage);
 
     return pinButton;
-  }
-
-  /**
-   * Получить ID Pin'a.
-   * @param {number} x
-   * @param {number} y
-   * @return {number}
-   */
-  function getPinId(x, y) {
-    return parseInt(x + y, 10);
   }
 
   /**
@@ -349,44 +339,33 @@
   /**
    * Удалить все дочерние элементы у DOM ноды.
    *
-   * @param {Element} node
-   * @param {Array} ignoreClasses
+   * @param {Element} node Текущая нода, у которой нужно удалить children'ов
+   * @param {Array} skipClasses Массив классов, которые удалять нельзя
    */
-  function removeChildNodes(node, ignoreClasses) {
+  function removeChildNodes(node, skipClasses) {
     if (!node) {
       return;
     }
-    ignoreClasses = ignoreClasses || [];
+    skipClasses = skipClasses || [];
 
-    var currentIndex = 0;
-    while (node.children[currentIndex]) {
-      if (hasClass(node.children[currentIndex], ignoreClasses)) {
-        currentIndex++;
-        continue;
+    var children = Array.prototype.slice.call(node.children);
+    children.forEach(function (childNode) {
+      var skipElement = false;
+      skipClasses.forEach(function (currentClass) {
+        if (childNode.classList.contains(currentClass)) {
+          skipElement = true;
+
+          return false;
+        }
+
+        return true;
+      });
+
+      if (skipElement) {
+        return;
       }
-      node.removeChild(node.children[currentIndex]);
-    }
-  }
-
-  /**
-   * Хелпер проверяет есть ли у element'a нужные классы.
-   *
-   * @param {Element} element
-   * @param {Array} classList
-   * @return {boolean}
-   */
-  function hasClass(element, classList) {
-    var found = false;
-
-    classList.forEach(function (className) {
-      if (element.className.indexOf(className) > -1) {
-        found = true;
-        return false;
-      }
-      return true;
+      childNode.remove();
     });
-
-    return found;
   }
 
   /**
@@ -450,7 +429,7 @@
     var form = document.querySelector('.notice__form');
     var pinMain = map.querySelector('.map__pin--main');
     var pinsContainer = map.querySelector('.map__pins');
-    var postData = getPosts(7);
+    var postData = getPosts(8);
 
     /**
      * Обработчик клика по красному маркеру.
@@ -473,7 +452,7 @@
     }
 
     function registerPinsHandlers() {
-      var pinsList = map.querySelectorAll('.map__pin');
+      var pinsList = Array.prototype.slice.call(map.querySelectorAll('.map__pin'));
       pinsList.forEach(function (pin) {
         if (!pin.classList.contains('map__pin--main')) {
           pin.addEventListener('click', processPin);
@@ -580,7 +559,7 @@
      * enable/disable для инпута формы
      */
     function toggleFormInputs() {
-      Array.from(form).forEach(function (element) {
+      Array.prototype.slice.call(form).forEach(function (element) {
         if (element.tagName.toLowerCase() !== 'fieldset') {
           return;
         }
@@ -606,7 +585,7 @@
      * Выключить подсветку у всех Pin
      */
     function deactivatePins() {
-      Array.from(pinsContainer.children).forEach(function (pin) {
+      Array.prototype.slice.call(pinsContainer.children).forEach(function (pin) {
         deactivatePin(pin);
       });
     }
@@ -615,7 +594,7 @@
      * Удалить все попапы из DOM'a
      */
     function removePopups() {
-      Array.from(map.children).forEach(function (item) {
+      Array.prototype.slice.call(map.children).forEach(function (item) {
         if (item.classList.contains('popup')) {
           item.remove();
         }
