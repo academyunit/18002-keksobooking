@@ -660,47 +660,43 @@
       var PRICE_MIN = 0;
       var PRICE_MAX = 1000000;
 
-      form.addEventListener('submit', function(e) {
-        e.preventDefault();
-      });
-
-      address.addEventListener('invalid', function() {
-        this.setCustomValidity('');
-        highlightInput(this, true);
-        if (this.validity.valueMissing) {
-          this.setCustomValidity('Обязательное поле');
-          highlightInput(this);
+      address.addEventListener('invalid', function () {
+        address.setCustomValidity('');
+        highlightInput(address, true);
+        if (address.validity.valueMissing) {
+          address.setCustomValidity('Обязательное поле');
+          highlightInput(address);
         }
       });
 
-      title.addEventListener('invalid', function() {
-        this.setCustomValidity('');
-        highlightInput(this, true);
-        if (this.validity.valueMissing) {
-          this.setCustomValidity('Обязательное поле');
-          highlightInput(this);
+      title.addEventListener('invalid', function () {
+        title.setCustomValidity('');
+        highlightInput(title, true);
+        if (title.validity.valueMissing) {
+          title.setCustomValidity('Обязательное поле');
+          highlightInput(title);
         }
-        if (this.validity.tooShort) {
-          this.setCustomValidity('Минимальное количество символов - ' + TITLE_MIN_LENGTH);
-          highlightInput(this);
+        if (title.validity.tooShort) {
+          title.setCustomValidity('Минимальное количество символов - ' + TITLE_MIN_LENGTH);
+          highlightInput(title);
         }
-        if (this.validity.tooLong) {
-          this.setCustomValidity('Максимальное количество символов - ' + TITLE_MAX_LENGTH);
-          highlightInput(this);
-        }
-      });
-
-      price.addEventListener('invalid', function(e) {
-        this.setCustomValidity('');
-        if (this.validity.typeMismatch) {
-          this.setCustomValidity('Цена должна быть числом!');
-        }
-        if (this.validity.valueMissing) {
-          this.setCustomValidity('Обязательное поле');
+        if (title.validity.tooLong) {
+          title.setCustomValidity('Максимальное количество символов - ' + TITLE_MAX_LENGTH);
+          highlightInput(title);
         }
       });
 
-      price.addEventListener('input', function(e) {
+      price.addEventListener('invalid', function () {
+        price.setCustomValidity('');
+        if (price.validity.typeMismatch) {
+          price.setCustomValidity('Цена должна быть числом!');
+        }
+        if (price.validity.valueMissing) {
+          price.setCustomValidity('Обязательное поле');
+        }
+      });
+
+      price.addEventListener('input', function (e) {
         var target = e.target;
 
         highlightInput(target, true);
@@ -744,30 +740,29 @@
         }
       };
 
-      timeIn.addEventListener('change', function() {
-        timeOut.value = this.value;
+      timeIn.addEventListener('change', function () {
+        timeOut.value = timeIn.value;
       });
 
-      type.addEventListener('change', function() {
-        price.value = formFieldsRelation['apartments'][this.value]
+      type.addEventListener('change', function () {
+        price.value = formFieldsRelation['apartments'][type.value];
       });
 
       var allCapacityOptions = Array.prototype.slice.call(capacity.cloneNode(true).children);
-      roomNumber.addEventListener('change', function() {
-        if (!this.value) {
+      roomNumber.addEventListener('change', function () {
+        if (!roomNumber.value) {
           return;
         }
-        var allowedOptions = formFieldsRelation['rooms'][this.value];
+        var allowedOptions = formFieldsRelation['rooms'][roomNumber.value];
         removeChildNodes(capacity);
 
         allCapacityOptions
-          .filter(function(option) {
-            return allowedOptions.indexOf(parseInt(option.value, 10)) > -1;
-          })
-          .forEach(function(item) {
-            capacity.appendChild(item);
-          })
-        ;
+            .filter(function (option) {
+              return allowedOptions.indexOf(parseInt(option.value, 10)) > -1;
+            })
+            .forEach(function (item) {
+              capacity.appendChild(item);
+            });
 
         /*
          // Почему такое не работает?
