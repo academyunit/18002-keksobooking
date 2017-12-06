@@ -104,15 +104,15 @@
       var locationX = getRandom(300, 900);
       var locationY = getRandom(100, 500);
       var post = {
-        'id': i,
-        'author': {
+        id: i,
+        author: {
           /*
            строка, адрес изображения вида img/avatars/user{{xx}}.png, где xx это число от 1 до 8 с ведущим нулем.
            Например 01, 02 и т. д. Адреса изображений не повторяются
            */
           'avatar': getAvatar(getRandomUniqueValue(avatarsCopy))
         },
-        'offer': {
+        offer: {
           /*
            строка, заголовок предложения, одно из фиксированных значений:
            'Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец',
@@ -120,57 +120,57 @@
            'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'.
            Значения не должны повторяться.
            */
-          'title': getRandomUniqueValue(titlesCopy),
+          title: getRandomUniqueValue(titlesCopy),
           /*
            строка, адрес предложения, представляет собой запись вида '{{location.x}}, {{location.y}}'
            */
-          'address': getAddressCoordinates(locationX, locationY),
+          address: getAddressCoordinates(locationX, locationY),
           /*
            * число, случайная цена от 1000 до 1000000
            */
-          'price': getRandom(1000, 1000000),
+          price: getRandom(1000, 1000000),
           /*
            строка с одним из трех фиксированных значений: flat, house или bungalo
            */
-          'type': getRandomArrayElement(LIST_APARTMENTS_TYPES),
+          type: getRandomArrayElement(LIST_APARTMENTS_TYPES),
           /*
            число, случайное количество комнат от 1 до 5
            */
-          'rooms': getRandom(1, 5),
+          rooms: getRandom(1, 5),
           /*
            число, случайное количество гостей, которое можно разместить
            */
-          'guests': getRandom(1, 20),
+          guests: getRandom(1, 20),
           /*
            строка с одним из трех фиксированных значений: 12:00, 13:00 или 14:00,
            */
-          'checkin': getRandomArrayElement(LIST_CHECK_IN),
+          checkin: getRandomArrayElement(LIST_CHECK_IN),
           /*
            строка с одним из трех фиксированных значений: 12:00, 13:00 или 14:00
            */
-          'checkout': getRandomArrayElement(LIST_CHECK_OUT),
+          checkout: getRandomArrayElement(LIST_CHECK_OUT),
           /*
            массив строк случайной длины из ниже предложенных: 'wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner',
            */
-          'features': getRandomFeatures(LIST_FEATURES),
+          features: getRandomFeatures(LIST_FEATURES),
           /*
            пустая строка
            */
-          'description': '',
+          description: '',
           /*
            пустой массив
            */
-          'photos': []
+          photos: []
         },
-        'location': {
+        location: {
           /*
            случайное число, координата x метки на карте в блоке .tokyo__pin-map от 300 до 900,
            */
-          'x': locationX,
+          x: locationX,
           /*
            случайное число, координата y метки на карте в блоке .tokyo__pin-map от 100 до 500
            */
-          'y': locationY
+          y: locationY
         }
       };
 
