@@ -631,5 +631,148 @@
     pinMain.addEventListener('mouseup', mainPinClickHandler);
   }
 
+  function initFormHandlers() {
+    var form = document.querySelector('.notice__form');
+    var address = form.querySelector('#address');
+    var title = form.querySelector('#title');
+
+    var timeIn = form.querySelector('#timein');
+    var timeOut = form.querySelector('#timeout');
+    var type = form.querySelector('#type');
+    var price = form.querySelector('#price');
+    var roomNumber = form.querySelector('#room_number');
+    var capacity = form.querySelector('#capacity');
+
+    function initValidators() {
+      var TITLE_MIN_LENGTH = 30;
+      var TITLE_MAX_LENGTH = 100;
+      var PRICE_MIN = 0;
+      var PRICE_MAX = 1000000;
+
+      address.addEventListener('invalid', function () {
+        address.setCustomValidity('');
+        highlightInput(address, true);
+        if (address.validity.valueMissing) {
+          address.setCustomValidity('Обязательное поле');
+          highlightInput(address);
+        }
+      });
+
+      title.addEventListener('invalid', function () {
+        title.setCustomValidity('');
+        highlightInput(title, true);
+        if (title.validity.valueMissing) {
+          title.setCustomValidity('Обязательное поле');
+          highlightInput(title);
+        }
+        if (title.validity.tooShort) {
+          title.setCustomValidity('Минимальное количество символов - ' + TITLE_MIN_LENGTH);
+          highlightInput(title);
+        }
+        if (title.validity.tooLong) {
+          title.setCustomValidity('Максимальное количество символов - ' + TITLE_MAX_LENGTH);
+          highlightInput(title);
+        }
+      });
+
+      price.addEventListener('invalid', function () {
+        price.setCustomValidity('');
+        if (price.validity.typeMismatch) {
+          price.setCustomValidity('Цена должна быть числом!');
+        }
+        if (price.validity.valueMissing) {
+          price.setCustomValidity('Обязательное поле');
+        }
+        if (price.validity.rangeUnderflow) {
+          price.setCustomValidity('Минимальная цена - ' + PRICE_MIN);
+          highlightInput(price);
+        }
+        if (price.validity.rangeOverflow) {
+          price.setCustomValidity('Максимальная цена - ' + PRICE_MAX);
+          highlightInput(price);
+        }
+      });
+
+      price.addEventListener('input', function (e) {
+        var target = e.target;
+
+        highlightInput(target, true);
+        target.setCustomValidity('');
+        if (isNaN(target.value)) {
+          target.setCustomValidity('В данном поле допустимы только цифры!');
+          highlightInput(target);
+        }
+      });
+
+      function highlightInput(input, revertChanges) {
+        if (revertChanges) {
+          input.style.border = '';
+          return;
+        }
+        input.style.border = '2px solid red';
+      }
+    }
+
+    function initRelatedFieldsHandlers() {
+      var formFieldsRelation = {
+        apartments: {
+          bungalo: 0,
+          flat: 1000,
+          house: 5000,
+          palace: 10000
+        },
+        rooms: {
+          1: [1],
+          2: [1, 2],
+          3: [1, 2, 3],
+          100: [0]
+        }
+      };
+
+      timeIn.addEventListener('change', function () {
+        timeOut.value = timeIn.value;
+      });
+
+      type.addEventListener('change', function () {
+        price.value = formFieldsRelation['apartments'][type.value];
+      });
+
+      // var allCapacityOptions = capacity.cloneNode(true).children;
+      var allCapacityOptions = Array.prototype.slice.call(capacity);
+      roomNumber.addEventListener('change', function () {
+        if (!roomNumber.value) {
+          return;
+        }
+        var allowedOptions = formFieldsRelation['rooms'][roomNumber.value];
+        removeChildNodes(capacity);
+
+        allCapacityOptions
+          .filter(function (option) {
+            return allowedOptions.indexOf(parseInt(option.value, 10)) > -1;
+          })
+          .forEach(function (item) {
+            capacity.appendChild(item);
+          });
+
+        /*
+         // Почему такое не работает?
+         var filteredOptions = Array.prototype.filter.call(allCapacityOptions, function(option) {
+         return (allowedOptions.indexOf(parseInt(option.value, 10)) > -1);
+         });
+
+         // Вот если этот кусок оставить раскомментированным, то он элементы из allCapacityOptions (того, что выше тоже закоменчен) начинают пропадать o_O aaaaa
+         filteredOptions.forEach(function(option) {
+         console.log('append', option);
+         capacity.appendChild(option);
+         });
+         */
+      });
+    }
+
+    initValidators();
+    initRelatedFieldsHandlers();
+  }
+
   initInterface();
+  initFormHandlers();
 })();
