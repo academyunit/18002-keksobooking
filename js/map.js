@@ -719,7 +719,6 @@
        *
        * @param {Element} element
        * @param {boolean} revertChanges
-       * @return {*}
        */
       function errorShow(element, revertChanges) {
         revertChanges = revertChanges || false;
@@ -778,8 +777,15 @@
         });
       });
 
+      /**
+       * Опция выключена ? (нет в списке разрешенных)
+       *
+       * @param {Array} allowedOptions
+       * @param {Element} option
+       * @return {boolean}
+       */
       function isDisabled(allowedOptions, option) {
-        return (allowedOptions.indexOf(parseInt(option.value, 10)) < 0)
+        return (allowedOptions.indexOf(parseInt(option.value, 10)) < 0);
       }
     }
 
