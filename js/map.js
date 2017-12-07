@@ -631,6 +631,9 @@
     pinMain.addEventListener('mouseup', mainPinClickHandler);
   }
 
+  /**
+   * Валдиторы формы.
+   */
   function initFormHandlers() {
     var form = document.querySelector('.notice__form');
     var address = form.querySelector('#address');
@@ -643,40 +646,46 @@
     var roomNumber = form.querySelector('#room_number');
     var capacity = form.querySelector('#capacity');
 
+    /**
+     * Проверка правильности введенных данных.
+     */
     function initValidators() {
-      var TITLE_MIN_LENGTH = 30;
-      var TITLE_MAX_LENGTH = 100;
-      var PRICE_MIN = 0;
-      var PRICE_MAX = 1000000;
+      title.addEventListener('invalid', function () {
+        errorShow(title);
+        title.setCustomValidity('');
 
-      address.addEventListener('invalid', function () {
-        address.setCustomValidity('');
-        highlightInput(address, true);
-        if (address.validity.valueMissing) {
-          address.setCustomValidity('Обязательное поле');
-          highlightInput(address);
+        if (title.validity.valueMissing) {
+          title.setCustomValidity('Обязательное поле');
+        }
+        if (title.validity.tooShort) {
+          title.setCustomValidity('Минимальное количество символов - ' + title.minLength);
+        }
+        if (title.validity.tooLong) {
+          title.setCustomValidity('Максимальное количество символов - ' + title.maxLength);
+        }
+
+        if (title.validity.valid) {
+          errorHide(title);
         }
       });
 
-      title.addEventListener('invalid', function () {
-        title.setCustomValidity('');
-        highlightInput(title, true);
-        if (title.validity.valueMissing) {
-          title.setCustomValidity('Обязательное поле');
-          highlightInput(title);
+      address.addEventListener('invalid', function () {
+        errorShow(address);
+        address.setCustomValidity('');
+
+        if (address.validity.valueMissing) {
+          address.setCustomValidity('Обязательное поле');
         }
-        if (title.validity.tooShort) {
-          title.setCustomValidity('Минимальное количество символов - ' + TITLE_MIN_LENGTH);
-          highlightInput(title);
-        }
-        if (title.validity.tooLong) {
-          title.setCustomValidity('Максимальное количество символов - ' + TITLE_MAX_LENGTH);
-          highlightInput(title);
+
+        if (address.validity.valid) {
+          errorHide(address);
         }
       });
 
       price.addEventListener('invalid', function () {
+        errorShow(price);
         price.setCustomValidity('');
+
         if (price.validity.typeMismatch) {
           price.setCustomValidity('Цена должна быть числом!');
         }
@@ -684,35 +693,47 @@
           price.setCustomValidity('Обязательное поле');
         }
         if (price.validity.rangeUnderflow) {
-          price.setCustomValidity('Минимальная цена - ' + PRICE_MIN);
-          highlightInput(price);
+          price.setCustomValidity('Минимальная цена - ' + price.min);
         }
         if (price.validity.rangeOverflow) {
-          price.setCustomValidity('Максимальная цена - ' + PRICE_MAX);
-          highlightInput(price);
+          price.setCustomValidity('Максимальная цена - ' + price.max);
+        }
+
+        if (price.validity.valid) {
+          errorHide(price);
         }
       });
 
-      price.addEventListener('input', function (e) {
-        var target = e.target;
+      /**
+       * Показать ошибку на input'e.
+       *
+       * @param {Element} element
+       * @return {*}
+       */
+      function errorHide(element) {
+        return errorShow(element, true);
+      }
 
-        highlightInput(target, true);
-        target.setCustomValidity('');
-        if (isNaN(target.value)) {
-          target.setCustomValidity('В данном поле допустимы только цифры!');
-          highlightInput(target);
-        }
-      });
-
-      function highlightInput(input, revertChanges) {
+      /**
+       * Скрыть ошибку на input'e.
+       *
+       * @param {Element} element
+       * @param {boolean} revertChanges
+       * @return {*}
+       */
+      function errorShow(element, revertChanges) {
+        revertChanges = revertChanges || false;
         if (revertChanges) {
-          input.style.border = '';
+          element.style.border = '';
           return;
         }
-        input.style.border = '2px solid red';
+        element.style.border = '2px solid red';
       }
     }
 
+    /**
+     * Автоматическая корректировка полей в форме.
+     */
     function initRelatedFieldsHandlers() {
       var formFieldsRelation = {
         apartments: {
@@ -733,40 +754,33 @@
         timeOut.value = timeIn.value;
       });
 
-      type.addEventListener('change', function () {
-        price.value = formFieldsRelation['apartments'][type.value];
+      timeOut.addEventListener('change', function () {
+        timeIn.value = timeOut.value;
       });
 
-      // var allCapacityOptions = capacity.cloneNode(true).children;
-      var allCapacityOptions = Array.prototype.slice.call(capacity);
+      type.addEventListener('change', function () {
+        var minPrice = formFieldsRelation['apartments'][type.value];
+        price.min = minPrice;
+        price.placeholder = minPrice;
+      });
+
       roomNumber.addEventListener('change', function () {
         if (!roomNumber.value) {
           return;
         }
+
         var allowedOptions = formFieldsRelation['rooms'][roomNumber.value];
-        removeChildNodes(capacity);
-
-        allCapacityOptions
-          .filter(function (option) {
-            return allowedOptions.indexOf(parseInt(option.value, 10)) > -1;
-          })
-          .forEach(function (item) {
-            capacity.appendChild(item);
-          });
-
-        /*
-         // Почему такое не работает?
-         var filteredOptions = Array.prototype.filter.call(allCapacityOptions, function(option) {
-         return (allowedOptions.indexOf(parseInt(option.value, 10)) > -1);
-         });
-
-         // Вот если этот кусок оставить раскомментированным, то он элементы из allCapacityOptions (того, что выше тоже закоменчен) начинают пропадать o_O aaaaa
-         filteredOptions.forEach(function(option) {
-         console.log('append', option);
-         capacity.appendChild(option);
-         });
-         */
+        Array.prototype.forEach.call(capacity, function (option) {
+          option.disabled = isDisabled(allowedOptions, option);
+          if (allowedOptions.length > 0) {
+            capacity.value = allowedOptions[0];
+          }
+        });
       });
+
+      function isDisabled(allowedOptions, option) {
+        return (allowedOptions.indexOf(parseInt(option.value, 10)) < 0)
+      }
     }
 
     initValidators();
