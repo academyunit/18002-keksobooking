@@ -650,6 +650,19 @@
      * Проверка правильности введенных данных.
      */
     function initValidators() {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        /*
+          Валидируем адрес тут, потому что invalid event не срабатывает для readonly inputs.
+         */
+        if (!isValidAddress()) {
+          return;
+        }
+
+        form.submit();
+      });
+
       title.addEventListener('invalid', function () {
         errorShow(title);
         title.setCustomValidity('');
@@ -666,19 +679,6 @@
 
         if (title.validity.valid) {
           errorHide(title);
-        }
-      });
-
-      address.addEventListener('invalid', function () {
-        errorShow(address);
-        address.setCustomValidity('');
-
-        if (address.validity.valueMissing) {
-          address.setCustomValidity('Обязательное поле');
-        }
-
-        if (address.validity.valid) {
-          errorHide(address);
         }
       });
 
@@ -703,6 +703,22 @@
           errorHide(price);
         }
       });
+
+      /**
+       * Валидный адрес?
+       *
+       * @return {boolean}
+       */
+      function isValidAddress() {
+        errorShow(address);
+
+        if (!address.value.length) {
+          return false;
+        }
+        errorHide(address);
+
+        return true;
+      }
 
       /**
        * Показать ошибку на input'e.
@@ -757,13 +773,22 @@
         timeIn.value = timeOut.value;
       });
 
-      type.addEventListener('change', function () {
+      type.addEventListener('change', minPriceHandler);
+      roomNumber.addEventListener('change', guestsNumberHandler);
+
+      /**
+       * Валидатор минимальной цены.
+       */
+      function minPriceHandler() {
         var minPrice = formFieldsRelation['apartments'][type.value];
         price.min = minPrice;
         price.placeholder = minPrice;
-      });
+      }
 
-      roomNumber.addEventListener('change', function () {
+      /**
+       * Валидатор гостей в комнатах.
+       */
+      function guestsNumberHandler() {
         if (!roomNumber.value) {
           return;
         }
@@ -775,7 +800,7 @@
             capacity.value = allowedOptions[0];
           }
         });
-      });
+      }
 
       /**
        * Опция выключена ? (нет в списке разрешенных)
@@ -787,6 +812,9 @@
       function isDisabled(allowedOptions, option) {
         return (allowedOptions.indexOf(parseInt(option.value, 10)) < 0);
       }
+
+      minPriceHandler();
+      guestsNumberHandler();
     }
 
     initValidators();
