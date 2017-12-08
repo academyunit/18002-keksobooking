@@ -648,13 +648,14 @@
 
     /**
      * Проверка правильности введенных данных.
+     * Делегирование с захватом =)
      */
     function initValidators() {
       form.addEventListener('submit', function(e) {
         e.preventDefault();
 
         /*
-          Валидируем адрес тут, потому что invalid event не срабатывает для readonly inputs.
+         Валидируем адрес тут, потому что invalid event не срабатывает для readonly inputs.
          */
         if (!isValidAddress()) {
           return;
@@ -662,27 +663,25 @@
 
         form.submit();
       });
+      form.addEventListener('invalid', function(e) {
+        var fieldName = e.target.name;
 
-      title.addEventListener('invalid', function () {
-        errorShow(title);
-        title.setCustomValidity('');
+        switch(fieldName) {
+          case 'price': {
+            validatePrice();
+            break;
+          }
+          case 'title': {
+            validateTitle();
+            break;
+          }
+        }
+      }, true);
 
-        if (title.validity.valueMissing) {
-          title.setCustomValidity('Обязательное поле');
-        }
-        if (title.validity.tooShort) {
-          title.setCustomValidity('Минимальное количество символов - ' + title.minLength);
-        }
-        if (title.validity.tooLong) {
-          title.setCustomValidity('Максимальное количество символов - ' + title.maxLength);
-        }
-
-        if (title.validity.valid) {
-          errorHide(title);
-        }
-      });
-
-      price.addEventListener('invalid', function () {
+      /**
+       * Проверка минимальной цены.
+       */
+      function validatePrice() {
         errorShow(price);
         price.setCustomValidity('');
 
@@ -702,7 +701,31 @@
         if (price.validity.valid) {
           errorHide(price);
         }
-      });
+      }
+
+      /**
+       * Проверка названия.
+       */
+      function validateTitle() {
+        title.addEventListener('invalid', function () {
+          errorShow(title);
+          title.setCustomValidity('');
+
+          if (title.validity.valueMissing) {
+            title.setCustomValidity('Обязательное поле');
+          }
+          if (title.validity.tooShort) {
+            title.setCustomValidity('Минимальное количество символов - ' + title.minLength);
+          }
+          if (title.validity.tooLong) {
+            title.setCustomValidity('Максимальное количество символов - ' + title.maxLength);
+          }
+
+          if (title.validity.valid) {
+            errorHide(title);
+          }
+        });
+      }
 
       /**
        * Валидный адрес?
