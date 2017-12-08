@@ -636,7 +636,6 @@
    */
   function initFormHandlers() {
     var form = document.querySelector('.notice__form');
-    var address = form.querySelector('#address');
     var title = form.querySelector('#title');
 
     var timeIn = form.querySelector('#timein');
@@ -651,18 +650,6 @@
      * Делегирование с захватом =)
      */
     function initValidators() {
-      form.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        /*
-         Валидируем адрес тут, потому что invalid event не срабатывает для readonly inputs.
-         */
-        if (!isValidAddress()) {
-          return;
-        }
-
-        form.submit();
-      });
       form.addEventListener('invalid', function(e) {
         var fieldName = e.target.name;
 
@@ -725,22 +712,6 @@
             errorHide(title);
           }
         });
-      }
-
-      /**
-       * Валидный адрес?
-       *
-       * @return {boolean}
-       */
-      function isValidAddress() {
-        errorShow(address);
-
-        if (!address.value.length) {
-          return false;
-        }
-        errorHide(address);
-
-        return true;
       }
 
       /**
