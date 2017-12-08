@@ -650,10 +650,10 @@
      * Делегирование с захватом =)
      */
     function initValidators() {
-      form.addEventListener('invalid', function(e) {
+      form.addEventListener('invalid', function (e) {
         var fieldName = e.target.name;
 
-        switch(fieldName) {
+        switch (fieldName) {
           case 'price': {
             validatePrice();
             break;
