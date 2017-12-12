@@ -1,6 +1,5 @@
 'use strict';
-
-(function () {
+window.card = (function () {
   /**
    * @todo: как сюда константы заимортить?
    *
@@ -11,11 +10,11 @@
    */
   var getApartmentTitleByType = function (type) {
     switch (type) {
-      case window.APARTMENT_TYPE_FLAT:
+      case window.data.constants.APARTMENT_TYPE_FLAT:
         return 'Квартира';
-      case window.APARTMENT_TYPE_HOUSE:
+      case window.data.constants.APARTMENT_TYPE_HOUSE:
         return 'Дом';
-      case window.APARTMENT_TYPE_BUNGALO:
+      case window.data.constants.APARTMENT_TYPE_BUNGALO:
         return 'Бунгало';
       default:
         return 'Тип жилья неизвестен';
@@ -96,7 +95,7 @@
    * @param {Object[]} data
    * @return {Node}
    */
-  window.getCard = function (data) {
+  var getCard = function (data) {
     var template = document.querySelector('template').content.querySelector('article.map__card');
 
     var post = template.cloneNode(true);
@@ -121,5 +120,9 @@
     userAvatar.src = data.author.avatar;
 
     return post;
+  };
+
+  return {
+    getCard: getCard
   };
 })();

@@ -1,9 +1,8 @@
 'use strict';
-
 /**
  * Валидаторы формы.
  */
-(function () {
+window.offerForm = (function () {
   var form = document.querySelector('.notice__form');
   var title = form.querySelector('#title');
 
@@ -24,15 +23,11 @@
 
       switch (fieldName) {
         case 'price':
-        {
           validatePrice();
           break;
-        }
         case 'title':
-        {
           validateTitle();
           break;
-        }
       }
     }, true);
 
@@ -89,10 +84,9 @@
      * Показать ошибку на input'e.
      *
      * @param {Element} element
-     * @return {*}
      */
     var errorHide = function (element) {
-      return errorShow(element, true);
+      errorShow(element, true);
     };
 
     /**
@@ -102,12 +96,7 @@
      * @param {boolean} revertChanges
      */
     var errorShow = function (element, revertChanges) {
-      revertChanges = revertChanges || false;
-      if (revertChanges) {
-        element.style.border = '';
-        return;
-      }
-      element.style.border = '2px solid red';
+      element.style.border = revertChanges ? '' : '2px solid red';
     };
   };
 
@@ -185,7 +174,7 @@
   /**
    * enable/disable для инпута формы
    */
-  window.toggleFormInputs = function () {
+  var toggleFormInputs = function () {
     Array.prototype.slice.call(form).forEach(function (element) {
       if (element.tagName.toLowerCase() !== 'fieldset') {
         return;
@@ -197,10 +186,15 @@
   /**
    * enable/disable для формы
    */
-  window.toggleForm = function () {
+  var toggleForm = function () {
     form.classList.toggle('notice__form--disabled');
   };
 
-  initValidators();
-  initRelatedFieldsHandlers();
+  return {
+    initValidators: initValidators,
+    initRelatedFieldsHandlers: initRelatedFieldsHandlers,
+    // @todo: эти 2 больше похожи на хелперы из util, чем на часть этого модуля.. да?
+    toggleFormInputs: toggleFormInputs,
+    toggleForm: toggleForm
+  };
 })();

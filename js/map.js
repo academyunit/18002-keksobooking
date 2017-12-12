@@ -1,64 +1,74 @@
 'use strict';
-(function () {
-  window.map = document.querySelector('.map');
+window.map = (function () {
+  var mapContainer = document.querySelector('.map');
+  var pinsContainer = mapContainer.querySelector('.map__pins');
 
   var form = document.querySelector('.notice__form');
-  var pinMain = window.map.querySelector('.map__pin--main');
-  var pinsContainer = window.map.querySelector('.map__pins');
-
-  window.postData = window.getPosts(8);
-  window.pins = pinsContainer.children;
+  var pinMain = mapContainer.querySelector('.map__pin--main');
 
   /**
    * enable/disable для карты
    */
   var toggleMap = function () {
-    window.map.classList.toggle('map--faded');
+    mapContainer.classList.toggle('map--faded');
   };
 
   /**
    * Обработчик клика по красному маркеру.
    */
-  var bigRedPinClickHandler = function () {
+  var draggablePinClickHandler = function () {
     // Включить инпуты в форме
-    window.toggleFormInputs(form);
+    window.offerForm.toggleFormInputs(form);
     // Активировать карту
     toggleMap();
     // Удаляем старые Pin'ы
-    window.removePins(pinsContainer);
+    window.pin.removePins(pinsContainer);
     // Показать метки похожих объявлений
-    window.renderPins(window.postData);
+    window.pin.renderPins(window.data.getPosts());
     //
     registerPinsHandlers();
     // Активировать форму
-    window.toggleForm();
+    window.offerForm.toggleForm();
 
-    pinMain.removeEventListener('mouseup', bigRedPinClickHandler);
+    pinMain.removeEventListener('mouseup', draggablePinClickHandler);
   };
 
   /**
    * @todo: здесь ли ему место? Или где лучше?
    */
   var registerPinsHandlers = function () {
-    var pinsList = Array.prototype.slice.call(window.map.querySelectorAll('.map__pin'));
+    var pinsList = Array.prototype.slice.call(mapContainer.querySelectorAll('.map__pin'));
     pinsList.forEach(function (pin) {
       if (!pin.classList.contains('map__pin--main')) {
         pin.addEventListener('click', function (ev) {
           // Почистить DOM от старых попапов
-          window.removePopups(window.map);
+          window.popupWindow.removePopups(mapContainer);
           // Активировать пин
-          window.processPin(ev);
+          window.pin.processPin(ev);
           // Создать попап и отрендерить его на карте
-          window.renderPopupOnMap(window.map, window.getPopUp(pin));
+          window.popupWindow.renderPopupOnMap(mapContainer, window.popupWindow.getPopUp(pin));
           // Повесить на document handler закрытия попапа по ESC
-          window.registerPopUpWindowListener();
+          window.popupWindow.registerPopUpWindowListener();
         });
       }
     });
   };
 
+  // Сгенерировать посты
+  window.data.generatePosts(8);
+
   // Отключить инпуты в форме
-  window.toggleFormInputs(form);
-  // Инициализация интерфейса с картой
-  pinMain.addEventListener('mouseup', bigRedPinClickHandler);
+  window.offerForm.toggleFormInputs(form);
+
+  // Инициализация обработчиков формы
+  window.offerForm.initValidators();
+  window.offerForm.initRelatedFieldsHandlers();
+
+  // Инициализация собыйтий и интерфейса карты по нажатию на красный маркер
+  pinMain.addEventListener('mouseup', draggablePinClickHandler);
+
+  return {
+    mapContainer: mapContainer,
+    pinsContainer: pinsContainer
+  };
 })();
