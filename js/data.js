@@ -22,6 +22,9 @@ window.data = (function () {
   /** Значение по-умолчанию (сколько постов генерировать, если не указано). */
   var DEFAULT_POSTS_AMOUNT = 8;
 
+  /** Массив сгенерированных постов */
+  var posts = [];
+
   /**
    * Получить ссылку на аватар пользователя.
    *
@@ -53,6 +56,25 @@ window.data = (function () {
     return window.util.shuffleArray(arr).filter(function () {
       return Math.random() < 0.5;
     });
+  };
+
+  /**
+   * Получить название жилья по типу.
+   *
+   * @param {string} type
+   * @return {string}
+   */
+  var getApartmentTitleByType = function (type) {
+    switch (type) {
+      case APARTMENT_TYPE_FLAT:
+        return 'Квартира';
+      case APARTMENT_TYPE_HOUSE:
+        return 'Дом';
+      case APARTMENT_TYPE_BUNGALO:
+        return 'Бунгало';
+      default:
+        return 'Тип жилья неизвестен';
+    }
   };
 
   /**
@@ -120,23 +142,11 @@ window.data = (function () {
     return null;
   };
 
-  /** Массив сгенерированных постов */
-  var posts = generatePosts(DEFAULT_POSTS_AMOUNT);
+  generatePosts(DEFAULT_POSTS_AMOUNT);
 
   return {
-    /**
-     * @todo: вот тут придумал такое решение, чтобы можно было один раз посты сгенерить
-     * и потом между разных модулей их передавать:
-     * 1) Запускаем в модуле map generatePosts(8)
-     * 2) В том же модуле map используем getPosts(), во всех остальных модулях тоже
-     */
     getPosts: getPosts,
     findPinById: findPinById,
-    // @todo: экспорт констант, потому что 1-му другому модулю они тоже нужен. что-то жесть костыль)
-    constants: {
-      APARTMENT_TYPE_FLAT: APARTMENT_TYPE_FLAT,
-      APARTMENT_TYPE_HOUSE: APARTMENT_TYPE_HOUSE,
-      APARTMENT_TYPE_BUNGALO: APARTMENT_TYPE_BUNGALO
-    }
+    getApartmentTitleByType: getApartmentTitleByType
   };
 })();

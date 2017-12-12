@@ -28,7 +28,7 @@ window.map = (function () {
     //
     registerPinsHandlers();
     // Активировать форму
-    window.util.toggleForm();
+    window.util.toggleForm(form);
 
     pinMain.removeEventListener('mouseup', draggablePinClickHandler);
   };
