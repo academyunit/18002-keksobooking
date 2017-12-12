@@ -5,16 +5,6 @@ window.util = (function () {
   var KEYBOARD_KEY_ESC = 27;
 
   /**
-   * @todo:
-   * 1) здесь нужен JSDoc и в каком формате его писать? К каждому методу или просто для объекта?
-   * 2) как-то теперь все очень странно выглядит и совсем неудобно. Как сделать лучше?
-   * 3) Если нужно обратиться к методу этого модуля изнутри этого модуля, то обязательно дописывать window все время впереди
-   *  (как в getRandomArrayElement() сделано сейчас) ?
-   *
-   * @type {{isEnterKeyPressed: Window.util.isEnterKeyPressed, isEscKeyPressed: Window.util.isEscKeyPressed}}
-   */
-
-  /**
    * Нажатие ENTER
    *
    * @param {Event} ev
@@ -111,6 +101,25 @@ window.util = (function () {
     });
   };
 
+  /**
+   * enable/disable для инпута формы
+   */
+  var toggleFieldsets = function (form) {
+    Array.prototype.slice.call(form).forEach(function (element) {
+      if (element.tagName.toLowerCase() !== 'fieldset') {
+        return;
+      }
+      element.disabled = !element.disabled;
+    });
+  };
+
+  /**
+   * enable/disable для формы
+   */
+  var toggleForm = function (form) {
+    form.classList.toggle('notice__form--disabled');
+  };
+
   return {
     isEnterKeyPressed: isEnterKeyPressed,
     isEscKeyPressed: isEscKeyPressed,
@@ -119,6 +128,8 @@ window.util = (function () {
     getRandom: getRandom,
     shuffleArray: shuffleArray,
     getRandomUniqueValue: getRandomUniqueValue,
-    removeChildNodes: removeChildNodes
+    removeChildNodes: removeChildNodes,
+    toggleFieldsets: toggleFieldsets,
+    toggleForm: toggleForm
   };
 })();

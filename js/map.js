@@ -18,7 +18,7 @@ window.map = (function () {
    */
   var draggablePinClickHandler = function () {
     // Включить инпуты в форме
-    window.offerForm.toggleFormInputs(form);
+    window.util.toggleFieldsets(form);
     // Активировать карту
     toggleMap();
     // Удаляем старые Pin'ы
@@ -28,7 +28,7 @@ window.map = (function () {
     //
     registerPinsHandlers();
     // Активировать форму
-    window.offerForm.toggleForm();
+    window.util.toggleForm();
 
     pinMain.removeEventListener('mouseup', draggablePinClickHandler);
   };
@@ -47,18 +47,13 @@ window.map = (function () {
           window.pin.processPin(ev);
           // Создать попап и отрендерить его на карте
           window.popupWindow.renderPopupOnMap(mapContainer, window.popupWindow.getPopUp(pin));
-          // Повесить на document handler закрытия попапа по ESC
-          window.popupWindow.registerPopUpWindowListener();
         });
       }
     });
   };
 
-  // Сгенерировать посты
-  window.data.generatePosts(8);
-
   // Отключить инпуты в форме
-  window.offerForm.toggleFormInputs(form);
+  window.util.toggleFieldsets(form);
 
   // Инициализация обработчиков формы
   window.offerForm.initValidators();

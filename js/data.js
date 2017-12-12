@@ -22,7 +22,6 @@ window.data = (function () {
   /** Значение по-умолчанию (сколько постов генерировать, если не указано). */
   var DEFAULT_POSTS_AMOUNT = 8;
 
-  var posts = [];
   /**
    * Получить ссылку на аватар пользователя.
    *
@@ -102,11 +101,7 @@ window.data = (function () {
    * @return {Array}
    */
   var getPosts = function () {
-    if (!posts.length) {
-      generatePosts(DEFAULT_POSTS_AMOUNT);
-    }
-
-    return posts;
+    return posts.slice();
   };
 
   /**
@@ -125,6 +120,9 @@ window.data = (function () {
     return null;
   };
 
+  /** Массив сгенерированных постов */
+  var posts = generatePosts(DEFAULT_POSTS_AMOUNT);
+
   return {
     /**
      * @todo: вот тут придумал такое решение, чтобы можно было один раз посты сгенерить
@@ -132,7 +130,6 @@ window.data = (function () {
      * 1) Запускаем в модуле map generatePosts(8)
      * 2) В том же модуле map используем getPosts(), во всех остальных модулях тоже
      */
-    generatePosts: generatePosts,
     getPosts: getPosts,
     findPinById: findPinById,
     // @todo: экспорт констант, потому что 1-му другому модулю они тоже нужен. что-то жесть костыль)

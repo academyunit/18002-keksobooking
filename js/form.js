@@ -139,7 +139,7 @@ window.offerForm = (function () {
       var allowedOptions = formFieldsRelation['rooms'][roomNumber.value];
       Array.prototype.forEach.call(capacity, function (option) {
         option.disabled = isDisabled(allowedOptions, option);
-        if (allowedOptions.length > 0) {
+        if (allowedOptions.length) {
           capacity.value = allowedOptions[0];
         }
       });
@@ -153,7 +153,7 @@ window.offerForm = (function () {
      * @return {boolean}
      */
     var isDisabled = function (allowedOptions, option) {
-      return (allowedOptions.indexOf(parseInt(option.value, 10)) < 0);
+      return allowedOptions.indexOf(parseInt(option.value, 10)) < 0;
     };
 
     timeIn.addEventListener('change', function () {
@@ -171,30 +171,8 @@ window.offerForm = (function () {
     guestsNumberHandler();
   };
 
-  /**
-   * enable/disable для инпута формы
-   */
-  var toggleFormInputs = function () {
-    Array.prototype.slice.call(form).forEach(function (element) {
-      if (element.tagName.toLowerCase() !== 'fieldset') {
-        return;
-      }
-      element.disabled = !element.disabled;
-    });
-  };
-
-  /**
-   * enable/disable для формы
-   */
-  var toggleForm = function () {
-    form.classList.toggle('notice__form--disabled');
-  };
-
   return {
     initValidators: initValidators,
-    initRelatedFieldsHandlers: initRelatedFieldsHandlers,
-    // @todo: эти 2 больше похожи на хелперы из util, чем на часть этого модуля.. да?
-    toggleFormInputs: toggleFormInputs,
-    toggleForm: toggleForm
+    initRelatedFieldsHandlers: initRelatedFieldsHandlers
   };
 })();

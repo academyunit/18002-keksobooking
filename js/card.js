@@ -83,17 +83,16 @@ window.card = (function () {
   var processFeatures = function (featuresList, items) {
     window.util.removeChildNodes(featuresList, ['map__pinsoverlay', 'map__pin--main']);
     var features = getFeaturesList(items);
-    if (!features) {
-      return;
+    if (features) {
+      featuresList.appendChild(features);
     }
-    featuresList.appendChild(features);
   };
 
   /**
    * Создать DOM для объявления.
    *
    * @param {Object[]} data
-   * @return {Node}
+   * @return {Element}
    */
   var getCard = function (data) {
     var template = document.querySelector('template').content.querySelector('article.map__card');

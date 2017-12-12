@@ -51,6 +51,8 @@ window.popupWindow = (function () {
       }
     });
 
+    registerPopUpWindowListener();
+
     return popup;
   };
 
@@ -90,8 +92,6 @@ window.popupWindow = (function () {
   };
 
   return {
-    // @todo: вот этот листенер кажется странным пробрасывать отсюда в другое место
-    registerPopUpWindowListener: registerPopUpWindowListener,
     getPopUp: getPopUp,
     removePopups: removePopups,
     renderPopupOnMap: renderPopupOnMap
