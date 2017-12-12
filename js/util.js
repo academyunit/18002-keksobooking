@@ -103,6 +103,8 @@ window.util = (function () {
 
   /**
    * enable/disable для инпута формы
+   *
+   * @param {Element|Node} form
    */
   var toggleFieldsets = function (form) {
     Array.prototype.slice.call(form).forEach(function (element) {
@@ -115,6 +117,8 @@ window.util = (function () {
 
   /**
    * enable/disable для формы
+   *
+   * @param {Element|Node} form
    */
   var toggleForm = function (form) {
     form.classList.toggle('notice__form--disabled');
