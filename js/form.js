@@ -105,28 +105,13 @@ window.offerForm = (function () {
    * Автоматическая корректировка полей в форме.
    */
   var initRelatedFieldsHandlers = function () {
-    var formFieldsRelation = {
-      apartments: {
-        bungalo: 0,
-        flat: 1000,
-        house: 5000,
-        palace: 10000
-      },
+    var ROOMS_GUESTS_VALIDATION_RULES = {
       rooms: {
         1: [1],
         2: [1, 2],
         3: [1, 2, 3],
         100: [0]
       }
-    };
-
-    /**
-     * Валидатор минимальной цены.
-     */
-    var minPriceHandler = function () {
-      var minPrice = formFieldsRelation['apartments'][type.value];
-      price.min = minPrice;
-      price.placeholder = minPrice;
     };
 
     /**
@@ -137,13 +122,20 @@ window.offerForm = (function () {
         return;
       }
 
-      var allowedOptions = formFieldsRelation['rooms'][roomNumber.value];
+      var allowedOptions = ROOMS_GUESTS_VALIDATION_RULES['rooms'][roomNumber.value];
       Array.prototype.forEach.call(capacity, function (option) {
         option.disabled = isDisabled(allowedOptions, option);
         if (allowedOptions.length) {
           capacity.value = allowedOptions[0];
         }
       });
+    };
+
+    /**
+     * Валидатор минимальной цены.
+     */
+    var minPriceHandler = function () {
+      window.syncTools.synchronizeFields(type, price, ['bungalo', 'flat', 'house', 'palace'], [0, 1000, 5000, 10000], window.syncTools.syncValueWithMin);
     };
 
     /**
@@ -158,11 +150,11 @@ window.offerForm = (function () {
     };
 
     timeIn.addEventListener('change', function () {
-      timeOut.value = timeIn.value;
+      window.syncTools.synchronizeFields(timeIn, timeOut, ['12:00', '13:00', '14:00'], ['12:00', '13:00', '14:00'], window.syncTools.syncValues);
     });
 
     timeOut.addEventListener('change', function () {
-      timeIn.value = timeOut.value;
+      window.syncTools.synchronizeFields(timeOut, timeIn, ['12:00', '13:00', '14:00'], ['12:00', '13:00', '14:00'], window.syncTools.syncValues);
     });
 
     type.addEventListener('change', minPriceHandler);
