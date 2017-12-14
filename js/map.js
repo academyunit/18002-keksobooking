@@ -1,5 +1,16 @@
 'use strict';
 window.map = (function () {
+  var LOCATION_RESTRICTIONS = {
+    x: {
+      min: 300,
+      max: 900
+    },
+    y: {
+      min: 100,
+      max: 500
+    }
+  };
+
   var mapContainer = document.querySelector('.map');
   var pinsContainer = mapContainer.querySelector('.map__pins');
 
@@ -9,28 +20,82 @@ window.map = (function () {
   /**
    * enable/disable для карты
    */
-  var toggleMap = function () {
-    mapContainer.classList.toggle('map--faded');
+  var showMap = function () {
+    mapContainer.classList.remove('map--faded');
   };
 
   /**
-   * Обработчик клика по красному маркеру.
+   * Проверка на выход значения из диапазона.
+   *
+   * @param {number} number
+   * @param {number} limitMin
+   * @param {number} limitMax
+   * @return {number}
    */
-  var draggablePinClickHandler = function () {
-    // Включить инпуты в форме
-    window.util.toggleFieldsets(form);
-    // Активировать карту
-    toggleMap();
-    // Удаляем старые Pin'ы
-    window.pin.removePins(pinsContainer);
-    // Показать метки похожих объявлений
-    window.pin.renderPins(window.data.getPosts());
-    //
-    registerPinsHandlers();
-    // Активировать форму
-    window.util.toggleForm(form);
+  var getCoordinateWithinLimitRange = function (number, limitMin, limitMax) {
+    return Math.min(Math.max(number, limitMin), limitMax);
+  };
 
-    pinMain.removeEventListener('mouseup', draggablePinClickHandler);
+  /**
+   * Кнопка нажата
+   * @param {Event} ev
+   */
+  var pinOnMouseDown = function (ev) {
+    ev.preventDefault();
+
+    var startCoordinates = {
+      x: ev.clientX,
+      y: ev.clientY
+    };
+
+    /**
+     * В процессе.
+     * @param {Event} moveEv
+     */
+    var onMouseMove = function (moveEv) {
+      moveEv.preventDefault();
+
+      var markerHalfSize = parseInt(getComputedStyle(window.map.pinMain).height, 10) / 2;
+
+      var shift = {
+        x: startCoordinates.x - window.map.pinMain.offsetLeft,
+        y: startCoordinates.y - window.map.pinMain.offsetTop
+      };
+
+      var moveLimits = {
+        minX: LOCATION_RESTRICTIONS.x.min,
+        minY: LOCATION_RESTRICTIONS.y.min - markerHalfSize,
+        maxX: LOCATION_RESTRICTIONS.x.max,
+        maxY: LOCATION_RESTRICTIONS.y.max - markerHalfSize
+      };
+
+      startCoordinates = {
+        x: moveEv.clientX,
+        y: moveEv.clientY
+      };
+
+      var coordinateX = getCoordinateWithinLimitRange(startCoordinates.x - shift.x, moveLimits.minX, moveLimits.maxX);
+      var coordinateY = getCoordinateWithinLimitRange(startCoordinates.y - shift.y, moveLimits.minY, moveLimits.maxY);
+
+      window.offerForm.setAddress(coordinateX, parseInt(coordinateY + markerHalfSize, 10));
+
+      window.map.pinMain.style.top = coordinateY + 'px';
+      window.map.pinMain.style.left = coordinateX + 'px';
+    };
+
+    /**
+     * Отпустили.
+     * @param {Event} upEv
+     */
+    var onMouseUp = function (upEv) {
+      upEv.preventDefault();
+
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
   };
 
   /**
@@ -53,17 +118,32 @@ window.map = (function () {
   };
 
   // Отключить инпуты в форме
-  window.util.toggleFieldsets(form);
+  window.util.switchFieldsetsControls(form, false);
 
   // Инициализация обработчиков формы
   window.offerForm.initValidators();
   window.offerForm.initRelatedFieldsHandlers();
 
   // Инициализация собыйтий и интерфейса карты по нажатию на красный маркер
-  pinMain.addEventListener('mouseup', draggablePinClickHandler);
+  pinMain.addEventListener('mousedown', function (ev) {
+    // Включить инпуты в форме
+    window.util.switchFieldsetsControls(form);
+    // Активировать карту
+    showMap();
+    // Удаляем старые Pin'ы
+    window.pin.removePins(pinsContainer);
+    // Показать метки похожих объявлений
+    window.pin.renderPins(window.data.getPosts());
+    registerPinsHandlers();
+    // Активировать форму
+    window.util.showForm(form);
+
+    pinOnMouseDown(ev);
+  });
 
   return {
     mapContainer: mapContainer,
-    pinsContainer: pinsContainer
+    pinsContainer: pinsContainer,
+    pinMain: pinMain
   };
 })();
