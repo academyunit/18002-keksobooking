@@ -1,5 +1,16 @@
 'use strict';
 window.map = (function () {
+  var LOCATION_RESTRICTIONS = {
+    x: {
+      min: 300,
+      max: 900
+    },
+    y: {
+      min: 100,
+      max: 500
+    }
+  };
+
   var mapContainer = document.querySelector('.map');
   var pinsContainer = mapContainer.querySelector('.map__pins');
 
@@ -13,6 +24,10 @@ window.map = (function () {
     mapContainer.classList.remove('map--faded');
   };
 
+  var checkLimit = function (number, limitMin, limitMax) {
+    return Math.min(Math.max(number, limitMin), limitMax);
+  };
+
   /**
    * Кнопка нажата
    * @param {Event} ev
@@ -20,44 +35,44 @@ window.map = (function () {
   var pinOnMouseDown = function(ev) {
     ev.preventDefault();
 
-    var startCoords = {
+    var startCoordinates = {
       x: ev.clientX,
       y: ev.clientY
     };
 
     /**
      * В процессе.
-     * @param {Event} ev
+     * @param {Event} moveEv
      */
     var onMouseMove = function (moveEv) {
       moveEv.preventDefault();
 
+      var markerHalfSize = parseInt(getComputedStyle(window.map.pinMain).height, 10) / 2;
+
       var shift = {
-        x: startCoords.x - moveEv.clientX,
-        y: startCoords.y - moveEv.clientY
+        x: startCoordinates.x - window.map.pinMain.offsetLeft,
+        y: startCoordinates.y - window.map.pinMain.offsetTop
       };
 
-      startCoords = {
+      var moveLimits = {
+        minX: LOCATION_RESTRICTIONS.x.min,
+        minY: LOCATION_RESTRICTIONS.y.min - markerHalfSize,
+        maxX: LOCATION_RESTRICTIONS.x.max,
+        maxY: LOCATION_RESTRICTIONS.y.max - markerHalfSize
+      };
+
+      startCoordinates = {
         x: moveEv.clientX,
         y: moveEv.clientY
       };
 
-      var markerSize = parseInt(getComputedStyle(window.map.pinMain).height, 10);
-      var limitSky = 100 - markerSize / 2;
-      var limitGround = 500 - markerSize / 2;
+      var coordinateX = checkLimit(startCoordinates.x - shift.x, moveLimits.minX, moveLimits.maxX);
+      var coordinateY = checkLimit(startCoordinates.y - shift.y, moveLimits.minY, moveLimits.maxY);
 
-      var coordinateY = (window.map.pinMain.offsetTop - shift.y);
-      if (coordinateY < limitSky) {
-        coordinateY = limitSky;
-      }
-      if (coordinateY > limitGround) {
-        coordinateY = limitGround;
-      }
-
-      window.offerForm.setAddress(startCoords.x, startCoords.y);
+      window.offerForm.setAddress(coordinateX, parseInt(coordinateY + markerHalfSize));
 
       window.map.pinMain.style.top = coordinateY + 'px';
-      window.map.pinMain.style.left = (window.map.pinMain.offsetLeft - shift.x) + 'px';
+      window.map.pinMain.style.left = coordinateX + 'px';
     };
 
     /**
@@ -66,8 +81,6 @@ window.map = (function () {
      */
     var onMouseUp = function (upEv) {
       upEv.preventDefault();
-
-      window.offerForm.setAddress(startCoords.x, startCoords.y);
 
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
