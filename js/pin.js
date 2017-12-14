@@ -97,10 +97,41 @@ window.pin = (function () {
     activatePin(pin);
   };
 
+  var pinOnMouseDown = function() {
+    document.addEventListener('mousemove', pinOnMouseMove);
+    document.addEventListener('mouseup', pinOnMouseUp);
+  };
+
+  var pinOnMouseMove = function(ev) {
+    var markerSize = parseInt(getComputedStyle(window.map.pinMain).height, 10);
+    var coordinateX = ev.clientX - window.map.mapContainer.offsetLeft;
+
+    var limitSky = 100 - markerSize / 2;
+    var limitGround = 500 - markerSize / 2;
+
+    var coordinateY = ev.clientY - window.map.mapContainer.offsetTop;
+    if (coordinateY < limitSky) {
+      coordinateY = limitSky;
+    }
+    if (coordinateY > limitGround) {
+      coordinateY = limitGround;
+    }
+
+    window.map.pinMain.style.left = coordinateX + 'px';
+    window.map.pinMain.style.top = coordinateY + 'px';
+  };
+
+  var pinOnMouseUp = function(ev) {
+    document.removeEventListener('mousemove', pinOnMouseMove);
+    document.removeEventListener('mouseup', pinOnMouseUp);
+  };
+
+
   return {
     processPin: processPin,
     deactivatePins: deactivatePins,
     renderPins: renderPins,
-    removePins: removePins
+    removePins: removePins,
+    pinOnMouseDown: pinOnMouseDown
   };
 })();

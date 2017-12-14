@@ -60,10 +60,14 @@ window.map = (function () {
   window.offerForm.initRelatedFieldsHandlers();
 
   // Инициализация собыйтий и интерфейса карты по нажатию на красный маркер
-  pinMain.addEventListener('mouseup', draggablePinClickHandler);
+  pinMain.addEventListener('mousedown', function(ev) {
+    draggablePinClickHandler(ev);
+    pin.pinOnMouseDown(ev);
+  });
 
   return {
     mapContainer: mapContainer,
-    pinsContainer: pinsContainer
+    pinsContainer: pinsContainer,
+    pinMain: pinMain
   };
 })();
