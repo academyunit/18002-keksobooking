@@ -106,12 +106,13 @@ window.util = (function () {
    *
    * @param {Element|Node} form
    */
-  var toggleFieldsets = function (form) {
+  var toggleFieldsets = function (form, isEnabled) {
+    isEnabled = isEnabled || false;
     Array.prototype.slice.call(form).forEach(function (element) {
       if (element.tagName.toLowerCase() !== 'fieldset') {
         return;
       }
-      element.disabled = !element.disabled;
+      element.disabled = isEnabled;
     });
   };
 
@@ -120,8 +121,8 @@ window.util = (function () {
    *
    * @param {Element|Node} form
    */
-  var toggleForm = function (form) {
-    form.classList.toggle('notice__form--disabled');
+  var showForm = function (form) {
+    form.classList.remove('notice__form--disabled');
   };
 
   return {
@@ -133,7 +134,7 @@ window.util = (function () {
     shuffleArray: shuffleArray,
     getRandomUniqueValue: getRandomUniqueValue,
     removeChildNodes: removeChildNodes,
-    toggleFieldsets: toggleFieldsets,
-    toggleForm: toggleForm
+    switchFieldsetsControls: toggleFieldsets,
+    showForm: showForm
   };
 })();

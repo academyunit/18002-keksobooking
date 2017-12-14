@@ -12,6 +12,7 @@ window.offerForm = (function () {
   var price = form.querySelector('#price');
   var roomNumber = form.querySelector('#room_number');
   var capacity = form.querySelector('#capacity');
+  var address = form.querySelector('#address');
 
   /**
    * Проверка правильности введенных данных.
@@ -171,8 +172,19 @@ window.offerForm = (function () {
     guestsNumberHandler();
   };
 
+  /**
+   * Обновить адрес в форме.
+   *
+   * @param {number} x
+   * @param {number} y
+   */
+  var setAddress = function(x, y) {
+    address.value = 'x: ' + x + ', y: ' + y;
+  };
+
   return {
     initValidators: initValidators,
-    initRelatedFieldsHandlers: initRelatedFieldsHandlers
+    initRelatedFieldsHandlers: initRelatedFieldsHandlers,
+    setAddress: setAddress
   };
 })();
