@@ -42,15 +42,27 @@ window.map = (function () {
         y: moveEv.clientY
       };
 
+      var markerSize = parseInt(getComputedStyle(window.map.pinMain).height, 10);
+      var limitSky = 100 - markerSize / 2;
+      var limitGround = 500 - markerSize / 2;
+
+      var coordinateY = (window.map.pinMain.offsetTop - shift.y);
+      if (coordinateY < limitSky) {
+        coordinateY = limitSky;
+      }
+      if (coordinateY > limitGround) {
+        coordinateY = limitGround;
+      }
+
       window.offerForm.setAddress(startCoords.x, startCoords.y);
 
-      window.map.pinMain.style.top = (window.map.pinMain.offsetTop - shift.y) + 'px';
+      window.map.pinMain.style.top = coordinateY + 'px';
       window.map.pinMain.style.left = (window.map.pinMain.offsetLeft - shift.x) + 'px';
     };
 
     /**
      * Отпустили.
-     * @param {Event} ev
+     * @param {Event} upEv
      */
     var onMouseUp = function (upEv) {
       upEv.preventDefault();
