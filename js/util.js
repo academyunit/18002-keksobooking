@@ -105,6 +105,7 @@ window.util = (function () {
    * enable/disable для инпута формы
    *
    * @param {Element|Node} form
+   * @param {boolean} isEnabled
    */
   var toggleFieldsets = function (form, isEnabled) {
     isEnabled = isEnabled || false;

@@ -178,7 +178,7 @@ window.offerForm = (function () {
    * @param {number} x
    * @param {number} y
    */
-  var setAddress = function(x, y) {
+  var setAddress = function (x, y) {
     address.value = 'x: ' + x + ', y: ' + y;
   };
 

@@ -24,7 +24,15 @@ window.map = (function () {
     mapContainer.classList.remove('map--faded');
   };
 
-  var checkLimit = function (number, limitMin, limitMax) {
+  /**
+   * Проверка на выход значения из диапазона.
+   *
+   * @param {number} number
+   * @param {number} limitMin
+   * @param {number} limitMax
+   * @return {number}
+   */
+  var getCoordinateWithinLimitRange = function (number, limitMin, limitMax) {
     return Math.min(Math.max(number, limitMin), limitMax);
   };
 
@@ -32,7 +40,7 @@ window.map = (function () {
    * Кнопка нажата
    * @param {Event} ev
    */
-  var pinOnMouseDown = function(ev) {
+  var pinOnMouseDown = function (ev) {
     ev.preventDefault();
 
     var startCoordinates = {
@@ -66,10 +74,10 @@ window.map = (function () {
         y: moveEv.clientY
       };
 
-      var coordinateX = checkLimit(startCoordinates.x - shift.x, moveLimits.minX, moveLimits.maxX);
-      var coordinateY = checkLimit(startCoordinates.y - shift.y, moveLimits.minY, moveLimits.maxY);
+      var coordinateX = getCoordinateWithinLimitRange(startCoordinates.x - shift.x, moveLimits.minX, moveLimits.maxX);
+      var coordinateY = getCoordinateWithinLimitRange(startCoordinates.y - shift.y, moveLimits.minY, moveLimits.maxY);
 
-      window.offerForm.setAddress(coordinateX, parseInt(coordinateY + markerHalfSize));
+      window.offerForm.setAddress(coordinateX, parseInt(coordinateY + markerHalfSize, 10));
 
       window.map.pinMain.style.top = coordinateY + 'px';
       window.map.pinMain.style.left = coordinateX + 'px';
@@ -117,7 +125,7 @@ window.map = (function () {
   window.offerForm.initRelatedFieldsHandlers();
 
   // Инициализация собыйтий и интерфейса карты по нажатию на красный маркер
-  pinMain.addEventListener('mousedown', function(ev) {
+  pinMain.addEventListener('mousedown', function (ev) {
     // Включить инпуты в форме
     window.util.switchFieldsetsControls(form);
     // Активировать карту
