@@ -81,7 +81,7 @@ window.popupWindow = (function () {
     unregisterPopUpWindowListener();
   };
 
-   return {
+  return {
     getPopUp: getPopUp,
     removePopups: removePopups
   };

@@ -1,9 +1,9 @@
 'use strict';
 
-window.syncTools = (function() {
-  var synchronizeFields = function(element1, element2, values1, values2, callback) {
+window.syncTools = (function () {
+  var synchronizeFields = function (element1, element2, values1, values2, callback) {
     for (var i = 0; i < values1.length; i++) {
-      if (element1.value == values1[i]) {
+      if (element1.value === values1[i]) {
         callback(element2, values2[i]);
         return;
       }
@@ -16,7 +16,7 @@ window.syncTools = (function() {
    * @param {Element} element
    * @param {number} value
    */
-  var syncValues = function(element, value) {
+  var syncValues = function (element, value) {
     element.value = value;
   };
 
@@ -26,7 +26,7 @@ window.syncTools = (function() {
    * @param {Element} element
    * @param {number} value
    */
-  var syncValueWithMin = function(element, value) {
+  var syncValueWithMin = function (element, value) {
     element.min = value;
     element.placeholder = value;
   };
