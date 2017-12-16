@@ -105,7 +105,7 @@ window.offerForm = (function () {
    * Автоматическая корректировка полей в форме.
    */
   var initRelatedFieldsHandlers = function () {
-    var ROOMS_GUESTS_VALIDATION_RULES = {
+    var synchronizeFields = {
       rooms: {
         1: [1],
         2: [1, 2],
@@ -113,6 +113,9 @@ window.offerForm = (function () {
         100: [0]
       }
     };
+    var apartmentTypes = ['bungalo', 'flat', 'house', 'palace'];
+    var prices = [0, 1000, 5000, 10000];
+    var checkInTime = ['12:00', '13:00', '14:00'];
 
     /**
      * Валидатор гостей в комнатах.
@@ -122,20 +125,13 @@ window.offerForm = (function () {
         return;
       }
 
-      var allowedOptions = ROOMS_GUESTS_VALIDATION_RULES['rooms'][roomNumber.value];
+      var allowedOptions = synchronizeFields['rooms'][roomNumber.value];
       Array.prototype.forEach.call(capacity, function (option) {
         option.disabled = isDisabled(allowedOptions, option);
         if (allowedOptions.length) {
           capacity.value = allowedOptions[0];
         }
       });
-    };
-
-    /**
-     * Валидатор минимальной цены.
-     */
-    var minPriceHandler = function () {
-      window.syncTools.synchronizeFields(type, price, ['bungalo', 'flat', 'house', 'palace'], [0, 1000, 5000, 10000], window.syncTools.syncValueWithMin);
     };
 
     /**
@@ -149,18 +145,12 @@ window.offerForm = (function () {
       return allowedOptions.indexOf(parseInt(option.value, 10)) < 0;
     };
 
-    timeIn.addEventListener('change', function () {
-      window.syncTools.synchronizeFields(timeIn, timeOut, ['12:00', '13:00', '14:00'], ['12:00', '13:00', '14:00'], window.syncTools.syncValues);
-    });
+    window.syncTools.synchronizeFields(timeIn, timeOut, checkInTime, checkInTime, window.syncTools.syncValues);
+    window.syncTools.synchronizeFields(timeOut, timeIn, checkInTime, checkInTime, window.syncTools.syncValues);
+    window.syncTools.synchronizeFields(type, price, apartmentTypes, prices, window.syncTools.syncValueWithMin);
 
-    timeOut.addEventListener('change', function () {
-      window.syncTools.synchronizeFields(timeOut, timeIn, ['12:00', '13:00', '14:00'], ['12:00', '13:00', '14:00'], window.syncTools.syncValues);
-    });
-
-    type.addEventListener('change', minPriceHandler);
     roomNumber.addEventListener('change', guestsNumberHandler);
 
-    minPriceHandler();
     guestsNumberHandler();
   };
 
