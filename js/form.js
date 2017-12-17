@@ -3,6 +3,14 @@
  * Валидаторы формы.
  */
 window.offerForm = (function () {
+  var APARTMENT_TYPES = ['bungalo', 'flat', 'house', 'palace'];
+  var APARTMENT_PRICES = [0, 1000, 5000, 10000];
+  var CHECK_IN_OUT_TIME = ['12:00', '13:00', '14:00'];
+  var ROOM_GUESTS_VALIDATION = {
+    rooms: [1, 2, 3, 100],
+    guests: [1, [1, 2], [1, 2, 3], 0]
+  };
+
   var form = document.querySelector('.notice__form');
   var title = form.querySelector('#title');
 
@@ -104,54 +112,40 @@ window.offerForm = (function () {
   /**
    * Автоматическая корректировка полей в форме.
    */
-  var initRelatedFieldsHandlers = function () {
-    var synchronizeFields = {
-      rooms: {
-        1: [1],
-        2: [1, 2],
-        3: [1, 2, 3],
-        100: [0]
-      }
-    };
-    var apartmentTypes = ['bungalo', 'flat', 'house', 'palace'];
-    var prices = [0, 1000, 5000, 10000];
-    var checkInTime = ['12:00', '13:00', '14:00'];
+  var initSync = function () {
+    window.syncTools.synchronizeFields(
+        timeIn,
+        timeOut,
+        CHECK_IN_OUT_TIME,
+        CHECK_IN_OUT_TIME,
+        window.syncTools.syncValues
+    );
 
-    /**
-     * Валидатор гостей в комнатах.
-     */
-    var guestsNumberHandler = function () {
-      if (!roomNumber.value) {
-        return;
-      }
+    window.syncTools.synchronizeFields(
+        timeOut,
+        timeIn,
+        CHECK_IN_OUT_TIME,
+        CHECK_IN_OUT_TIME,
+        window.syncTools.syncValues
+    );
 
-      var allowedOptions = synchronizeFields['rooms'][roomNumber.value];
-      Array.prototype.forEach.call(capacity, function (option) {
-        option.disabled = isDisabled(allowedOptions, option);
-        if (allowedOptions.length) {
-          capacity.value = allowedOptions[0];
-        }
-      });
-    };
+    window.syncTools.synchronizeFields(
+        roomNumber,
+        capacity,
+        ROOM_GUESTS_VALIDATION.rooms,
+        ROOM_GUESTS_VALIDATION.guests,
+        window.syncTools.syncMultipleValues,
+        true
+    );
 
-    /**
-     * Опция выключена ? (нет в списке разрешенных)
-     *
-     * @param {Array} allowedOptions
-     * @param {Element} option
-     * @return {boolean}
-     */
-    var isDisabled = function (allowedOptions, option) {
-      return allowedOptions.indexOf(parseInt(option.value, 10)) < 0;
-    };
-
-    window.syncTools.synchronizeFields(timeIn, timeOut, checkInTime, checkInTime, window.syncTools.syncValues);
-    window.syncTools.synchronizeFields(timeOut, timeIn, checkInTime, checkInTime, window.syncTools.syncValues);
-    window.syncTools.synchronizeFields(type, price, apartmentTypes, prices, window.syncTools.syncValueWithMin);
-
-    roomNumber.addEventListener('change', guestsNumberHandler);
-
-    guestsNumberHandler();
+    window.syncTools.synchronizeFields(
+        type,
+        price,
+        APARTMENT_TYPES,
+        APARTMENT_PRICES,
+        window.syncTools.syncValueWithMin,
+        true
+    );
   };
 
   /**
@@ -166,7 +160,7 @@ window.offerForm = (function () {
 
   return {
     initValidators: initValidators,
-    initRelatedFieldsHandlers: initRelatedFieldsHandlers,
+    initSync: initSync,
     setAddress: setAddress
   };
 })();
