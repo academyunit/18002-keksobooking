@@ -3,6 +3,14 @@
  * Валидаторы формы.
  */
 window.offerForm = (function () {
+  var APARTMENT_TYPES = ['bungalo', 'flat', 'house', 'palace'];
+  var APARTMENT_PRICES = [0, 1000, 5000, 10000];
+  var CHECK_IN_OUT_TIME = ['12:00', '13:00', '14:00'];
+  var ROOM_GUESTS_VALIDATION = {
+    rooms: [1, 2, 3, 100],
+    guests: [1, [1, 2], [1, 2, 3], 0]
+  };
+
   var form = document.querySelector('.notice__form');
   var title = form.querySelector('#title');
 
@@ -104,72 +112,40 @@ window.offerForm = (function () {
   /**
    * Автоматическая корректировка полей в форме.
    */
-  var initRelatedFieldsHandlers = function () {
-    var formFieldsRelation = {
-      apartments: {
-        bungalo: 0,
-        flat: 1000,
-        house: 5000,
-        palace: 10000
-      },
-      rooms: {
-        1: [1],
-        2: [1, 2],
-        3: [1, 2, 3],
-        100: [0]
-      }
-    };
+  var initSync = function () {
+    window.syncTools.synchronizeFields(
+        timeIn,
+        timeOut,
+        CHECK_IN_OUT_TIME,
+        CHECK_IN_OUT_TIME,
+        window.syncTools.syncValues
+    );
 
-    /**
-     * Валидатор минимальной цены.
-     */
-    var minPriceHandler = function () {
-      var minPrice = formFieldsRelation['apartments'][type.value];
-      price.min = minPrice;
-      price.placeholder = minPrice;
-    };
+    window.syncTools.synchronizeFields(
+        timeOut,
+        timeIn,
+        CHECK_IN_OUT_TIME,
+        CHECK_IN_OUT_TIME,
+        window.syncTools.syncValues
+    );
 
-    /**
-     * Валидатор гостей в комнатах.
-     */
-    var guestsNumberHandler = function () {
-      if (!roomNumber.value) {
-        return;
-      }
+    window.syncTools.synchronizeFields(
+        roomNumber,
+        capacity,
+        ROOM_GUESTS_VALIDATION.rooms,
+        ROOM_GUESTS_VALIDATION.guests,
+        window.syncTools.syncMultipleValues,
+        true
+    );
 
-      var allowedOptions = formFieldsRelation['rooms'][roomNumber.value];
-      Array.prototype.forEach.call(capacity, function (option) {
-        option.disabled = isDisabled(allowedOptions, option);
-        if (allowedOptions.length) {
-          capacity.value = allowedOptions[0];
-        }
-      });
-    };
-
-    /**
-     * Опция выключена ? (нет в списке разрешенных)
-     *
-     * @param {Array} allowedOptions
-     * @param {Element} option
-     * @return {boolean}
-     */
-    var isDisabled = function (allowedOptions, option) {
-      return allowedOptions.indexOf(parseInt(option.value, 10)) < 0;
-    };
-
-    timeIn.addEventListener('change', function () {
-      timeOut.value = timeIn.value;
-    });
-
-    timeOut.addEventListener('change', function () {
-      timeIn.value = timeOut.value;
-    });
-
-    type.addEventListener('change', minPriceHandler);
-    roomNumber.addEventListener('change', guestsNumberHandler);
-
-    minPriceHandler();
-    guestsNumberHandler();
+    window.syncTools.synchronizeFields(
+        type,
+        price,
+        APARTMENT_TYPES,
+        APARTMENT_PRICES,
+        window.syncTools.syncValueWithMin,
+        true
+    );
   };
 
   /**
@@ -184,7 +160,7 @@ window.offerForm = (function () {
 
   return {
     initValidators: initValidators,
-    initRelatedFieldsHandlers: initRelatedFieldsHandlers,
+    initSync: initSync,
     setAddress: setAddress
   };
 })();

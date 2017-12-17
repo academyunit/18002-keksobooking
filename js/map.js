@@ -111,7 +111,7 @@ window.map = (function () {
           // Активировать пин
           window.pin.processPin(ev);
           // Создать попап и отрендерить его на карте
-          window.popupWindow.renderPopupOnMap(mapContainer, window.popupWindow.getPopUp(pin));
+          window.cardTools.showCard(window.popupWindow.getPopUp(pin));
         });
       }
     });
@@ -122,7 +122,7 @@ window.map = (function () {
 
   // Инициализация обработчиков формы
   window.offerForm.initValidators();
-  window.offerForm.initRelatedFieldsHandlers();
+  window.offerForm.initSync();
 
   // Инициализация собыйтий и интерфейса карты по нажатию на красный маркер
   pinMain.addEventListener('mousedown', function (ev) {

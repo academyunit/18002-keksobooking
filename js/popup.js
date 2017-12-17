@@ -81,19 +81,8 @@ window.popupWindow = (function () {
     unregisterPopUpWindowListener();
   };
 
-  /**
-   * Добавить объявление на карту.
-   *
-   * @param {Element} map
-   * @param {Element} post
-   */
-  var renderPopupOnMap = function (map, post) {
-    window.map.mapContainer.appendChild(post);
-  };
-
   return {
     getPopUp: getPopUp,
-    removePopups: removePopups,
-    renderPopupOnMap: renderPopupOnMap
+    removePopups: removePopups
   };
 })();
