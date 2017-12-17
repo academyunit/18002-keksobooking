@@ -36,23 +36,6 @@ window.backend = (function () {
   };
 
   /**
-   * Дефолтный callback для успешного выполнения AJAX-запроса.
-   */
-  var defaultOnSuccess = function () {
-    // @todo: наверн не оч хороший вариант зависимость сюда сувать?
-    window.util.showFlashMessage('Данные успешно загружены/отправлены с/на сервер!');
-  };
-
-  /**
-   * Дефолтный callback для неудачного выполнения AJAX-запроса.
-   *
-   * @param {Array} error
-   */
-  var defaultOnError = function (error) {
-    window.util.showFlashMessage('Ошибка загрузки данных c/на сервер!' + error, false);
-  };
-
-  /**
    * Обертка для работы с XMLHttpRequest.
    *
    * @param {Object} options Настройки
