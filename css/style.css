@@ -851,6 +851,7 @@ textarea:focus
 .ajax-message {
     position: absolute;
     top: 0;
+    left: 0;
     z-index: 999;
 
     margin: 0;
