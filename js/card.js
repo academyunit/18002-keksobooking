@@ -1,5 +1,12 @@
 'use strict';
+
 window.card = (function () {
+  var APARTMENT_TYPE = {
+    flat: 'Квартира',
+    house: 'Дом',
+    bungalo: 'Бунгало'
+  };
+
   /**
    * Кол-во комнат и гостей.
    *
@@ -87,10 +94,12 @@ window.card = (function () {
     var description = post.querySelector('.popup__features + p');
     var userAvatar = post.querySelector('.popup__avatar');
 
+    var typeName = APARTMENT_TYPE[data.offer.type] || 'Тип жилья неизвестен';
+
     title.textContent = data.offer.title;
     address.textContent = data.offer.address;
     price.textContent = getFormattedPrice(data.offer.price);
-    type.textContent = window.data.getApartmentTitleByType(data.offer.type);
+    type.textContent = typeName;
     roomsAndGuests.textContent = getGuestsAndRoomsDescription(data.offer.rooms, data.offer.guests);
     checkTime.textContent = getCheckTime(data.offer.checkin, data.offer.checkout);
     processFeatures(featuresList, data.offer.features);

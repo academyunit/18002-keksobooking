@@ -1,4 +1,5 @@
 'use strict';
+
 window.map = (function () {
   var LOCATION_RESTRICTIONS = {
     x: {
@@ -116,6 +117,30 @@ window.map = (function () {
       }
     });
   };
+
+  /**
+   * Handler в случае успешного ответа.
+   *
+   * @param {Array} response
+   */
+  var onSuccess = function (response) {
+    if (!response.length) {
+      window.util.showFlashMessage('Пришел пустой ответ!', true);
+      return;
+    }
+    var posts = response.map(function (item, index) {
+      item.id = index;
+      return item;
+    });
+    window.data.setPosts(posts);
+
+    window.util.showFlashMessage('Данные успешно загружены!');
+  };
+
+  // Грузим данные с бэкэнда
+  window.backend.load('https://1510.dump.academy/keksobooking/data', onSuccess, function (error) {
+    window.util.showFlashMessage(error, true);
+  });
 
   // Отключить инпуты в форме
   window.util.switchFieldsetsControls(form, false);
