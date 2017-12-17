@@ -43,8 +43,6 @@ window.backend = (function () {
   var sendRequest = function (options) {
     var timeOut = options.timeOut || TIMEOUT_MAX_TIME;
     var responseType = options.responseType || DEFAULT_RESPONSE_TYPE;
-    var onSuccess = typeof options.onSuccess === 'function' ? options.onSuccess : defaultOnSuccess;
-    var onError = typeof options.onError === 'function' ? options.onError : defaultOnError;
     var url = options.url ? options.url : '';
     var data = options.data ? options.data : null;
 
@@ -56,7 +54,7 @@ window.backend = (function () {
 
       switch (xhr.status) {
         case 200:
-          onSuccess(xhr.response);
+          options.onSuccess(xhr.response);
           break;
         case 400:
           error = xhr.status + ' - Неверный запрос';
@@ -73,14 +71,14 @@ window.backend = (function () {
       }
 
       if (error) {
-        onError(error);
+        options.onError(error);
       }
     });
     xhr.addEventListener('error', function () {
-      onError('Ошибка соединения!');
+      options.onError('Ошибка соединения!');
     });
     xhr.addEventListener('timeout', function () {
-      onError('Запрос не успел выполниться за ' + xhr.timeout + 'мс');
+      options.onError('Запрос не успел выполниться за ' + xhr.timeout + 'мс');
     });
     xhr.timeout = timeOut;
 
