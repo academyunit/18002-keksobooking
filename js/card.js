@@ -1,5 +1,9 @@
 'use strict';
 window.card = (function () {
+  var APARTMENT_TYPE_FLAT = 'flat';
+  var APARTMENT_TYPE_HOUSE = 'house';
+  var APARTMENT_TYPE_BUNGALO = 'bungalo';
+
   /**
    * Кол-во комнат и гостей.
    *
@@ -68,6 +72,25 @@ window.card = (function () {
   };
 
   /**
+   * Получить название жилья по типу.
+   *
+   * @param {string} type
+   * @return {string}
+   */
+  var getApartmentTitleByType = function (type) {
+    switch (type) {
+      case APARTMENT_TYPE_FLAT:
+        return 'Квартира';
+      case APARTMENT_TYPE_HOUSE:
+        return 'Дом';
+      case APARTMENT_TYPE_BUNGALO:
+        return 'Бунгало';
+      default:
+        return 'Тип жилья неизвестен';
+    }
+  };
+
+  /**
    * Создать DOM для объявления.
    *
    * @param {Object[]} data
@@ -90,7 +113,7 @@ window.card = (function () {
     title.textContent = data.offer.title;
     address.textContent = data.offer.address;
     price.textContent = getFormattedPrice(data.offer.price);
-    type.textContent = window.data.getApartmentTitleByType(data.offer.type);
+    type.textContent = getApartmentTitleByType(data.offer.type);
     roomsAndGuests.textContent = getGuestsAndRoomsDescription(data.offer.rooms, data.offer.guests);
     checkTime.textContent = getCheckTime(data.offer.checkin, data.offer.checkout);
     processFeatures(featuresList, data.offer.features);

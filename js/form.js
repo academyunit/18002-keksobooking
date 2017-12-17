@@ -27,6 +27,12 @@ window.offerForm = (function () {
    * Делегирование с захватом =)
    */
   var initValidators = function () {
+    form.addEventListener('submit', function(ev) {
+      ev.preventDefault();
+      window.backend.save(new FormData(form), function(response) {
+      });
+    });
+
     form.addEventListener('invalid', function (e) {
       var fieldName = e.target.name;
 

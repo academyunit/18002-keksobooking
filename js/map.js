@@ -116,6 +116,13 @@ window.map = (function () {
       }
     });
   };
+  var onError = function (message) {
+    console.error(message);
+  };
+
+  var onSuccess = function (data) {
+    console.log(data);
+  };
 
   // Отключить инпуты в форме
   window.util.switchFieldsetsControls(form, false);
