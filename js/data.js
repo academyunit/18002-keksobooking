@@ -1,19 +1,18 @@
 'use strict';
+
 window.data = (function () {
   /** Массив сгенерированных постов */
   var posts = [];
 
   /**
-   * Add Ids
+   * Сохранить посты в переменную posts.
    *
    * @param {Array} data
-   * @returns {Array}
    */
-  var assignIds = function (data) {
-    return data.map(function(item, index) {
-      item.id = index;
-      return item;
-    });
+  var setPosts = function (data) {
+    if (posts.constructor === Array) {
+      posts = data;
+    }
   };
 
   /**
@@ -41,14 +40,8 @@ window.data = (function () {
     return null;
   };
 
-  window.backend.load('https://1510.dump.academy/keksobooking/data', function (response) {
-    if (!response || !response) {
-      return;
-    }
-    posts = assignIds(response);
-  });
-
   return {
+    setPosts: setPosts,
     getPosts: getPosts,
     findPinById: findPinById
   };

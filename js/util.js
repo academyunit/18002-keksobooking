@@ -126,6 +126,48 @@ window.util = (function () {
     form.classList.remove('notice__form--disabled');
   };
 
+  /**
+   * Показать сообщение об ошибке.
+   *
+   * @param {String} message
+   * @param {Boolean} isFail
+   */
+  var showFlashMessage = function (message, isFail) {
+    var messageNode = document.createElement('p');
+    messageNode.className = 'ajax-message';
+    if (isFail) {
+      messageNode.classList.add('ajax-message--error');
+    }
+    var textNode = document.createTextNode(message);
+
+    messageNode.appendChild(textNode);
+    document.body.appendChild(messageNode);
+
+    fadeOutAnimation(messageNode, 100);
+    setTimeout(function () {
+      document.body.removeChild(messageNode);
+    }, 3000);
+  };
+
+  /**
+   * Имитируем jQuery fadeOut() :)
+   *
+   * @param {Element} element
+   * @param {Number} milliseconds
+   */
+  var fadeOutAnimation = function (element, milliseconds) {
+    milliseconds = milliseconds || 50;
+    var opacity = 1;
+    var timer = setInterval(function () {
+      if (opacity <= 0.1) {
+        clearInterval(timer);
+        element.style.display = 'none';
+      }
+      element.style.opacity = opacity;
+      opacity -= opacity * 0.1;
+    }, milliseconds);
+  };
+
   return {
     isEnterKeyPressed: isEnterKeyPressed,
     isEscKeyPressed: isEscKeyPressed,
@@ -136,6 +178,7 @@ window.util = (function () {
     getRandomUniqueValue: getRandomUniqueValue,
     removeChildNodes: removeChildNodes,
     switchFieldsetsControls: toggleFieldsets,
-    showForm: showForm
+    showForm: showForm,
+    showFlashMessage: showFlashMessage
   };
 })();

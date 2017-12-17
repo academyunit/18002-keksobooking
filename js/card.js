@@ -1,4 +1,5 @@
 'use strict';
+
 window.card = (function () {
   var APARTMENT_TYPE_FLAT = 'flat';
   var APARTMENT_TYPE_HOUSE = 'house';

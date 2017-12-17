@@ -1,4 +1,5 @@
 'use strict';
+
 /**
  * Валидаторы формы.
  */
@@ -27,9 +28,13 @@ window.offerForm = (function () {
    * Делегирование с захватом =)
    */
   var initValidators = function () {
-    form.addEventListener('submit', function(ev) {
+    form.addEventListener('submit', function (ev) {
       ev.preventDefault();
-      window.backend.save(new FormData(form), function(response) {
+
+      window.backend.save(new FormData(form), function () {
+        window.util.showFlashMessage('Форма отправлена. Спасибо!');
+      }, function (error) {
+        window.util.showFlashMessage('Ошибка отправки формы! ' + error, false);
       });
     });
 
