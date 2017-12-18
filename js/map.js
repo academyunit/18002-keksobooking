@@ -14,6 +14,7 @@ window.map = (function () {
 
   var mapContainer = document.querySelector('.map');
   var pinsContainer = mapContainer.querySelector('.map__pins');
+  var pinFilters = document.querySelector('.map__filters');
 
   var form = document.querySelector('.notice__form');
   var pinMain = mapContainer.querySelector('.map__pin--main');
@@ -164,6 +165,12 @@ window.map = (function () {
     window.util.showForm(form);
 
     pinOnMouseDown(ev);
+  });
+
+  pinFilters.addEventListener('change', function(ev) {
+    window.pin.removePins(pinsContainer);
+    window.pin.renderPins(window.pin.getFilteredPins(ev));
+    registerPinsHandlers();
   });
 
   return {

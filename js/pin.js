@@ -1,6 +1,19 @@
 'use strict';
 
 window.pin = (function () {
+  var filter = {
+    housingType: null,
+    housingPrice: null,
+    housingRooms: null,
+    housingGuests: null,
+    featureWifi: null,
+    featureDishwasher: null,
+    featureParking: null,
+    featureWasher: null,
+    featureElevator: null,
+    featureConditioner: null
+  };
+
   /**
    * Создать Pin кнопку для карты.
    *
@@ -97,10 +110,129 @@ window.pin = (function () {
     activatePin(pin);
   };
 
+  var getPriceRangeByName = function (name) {
+    var min = 0;
+    var max = 0;
+    switch (name) {
+      case 'middle':
+        min = 10000;
+        max = 50000;
+        break;
+      case 'low':
+        min = 0;
+        max = 10000;
+        break;
+      case 'high':
+        min = 50000;
+        max = -1;
+        break;
+      default:
+        min = -1;
+        max = -1;
+    }
+
+    return {
+      min: min,
+      max: max
+    };
+  };
+
+  var isHousingPriceWithingRange = function (value, price) {
+    var priceRange = getPriceRangeByName(value);
+    if (priceRange.min < 0 && priceRange.max < 0) {
+      return true;
+    }
+    if (price >= priceRange.min && priceRange.max < 0) {
+      return true;
+    }
+
+    return (price >= priceRange.min && price <= priceRange.max);
+  };
+
+  var isFeatureTurnedOn = function (features, featureToCheck) {
+    return features.indexOf(featureToCheck) > -1;
+  };
+
+  var getFilteredPins = function (ev) {
+    var target = ev.target;
+    var value = target.value;
+
+    var posts = window.data.getPosts();
+
+    if (target.id == 'housing-type') {
+      filter.housingType = value == 'any' ? null : value;
+    }
+    if (target.id == 'housing-price') {
+      filter.housingPrice = value == 'any' ? null : value;
+    }
+    if (target.id == 'housing-rooms') {
+      filter.housingRooms = value == 'any' ? null : value;
+    }
+    if (target.id == 'housing-guests') {
+      filter.housingGuests = value == 'any' ? null : value;
+    }
+    if (target.id == 'filter-wifi') {
+      filter.featureWifi = target.checked ? value : null;
+    }
+    if (target.id == 'filter-dishwasher') {
+      filter.featureDishwasher = target.checked ? value : null;
+    }
+    if (target.id == 'filter-parking') {
+      filter.featureParking = target.checked ? value : null;
+    }
+    if (target.id == 'filter-washer') {
+      filter.featureWasher = target.checked ? value : null;
+    }
+    if (target.id == 'filter-elevator') {
+      filter.featureElevator = target.checked ? value : null;
+    }
+    if (target.id == 'filter-conditioner') {
+      filter.featureConditioner = target.checked ? value : null;
+    }
+
+    posts = posts.filter(function(post) {
+      if (filter.housingType && post.offer.type !== filter.housingType) {
+        return false;
+      }
+      if (filter.housingRooms && post.offer.rooms !== parseInt(filter.housingRooms)) {
+        return false;
+      }
+      if (filter.housingPrice && !isHousingPriceWithingRange(filter.housingPrice, post.offer.price)) {
+        return false;
+      }
+      if (filter.housingGuests && post.offer.guests !== parseInt(filter.housingGuests)) {
+        return false;
+      }
+      if (filter.featureWifi && !isFeatureTurnedOn(post.offer.features, filter.featureWifi)) {
+        return false;
+      }
+      if (filter.featureDishwasher && !isFeatureTurnedOn(post.offer.features, filter.featureDishwasher)) {
+        return false;
+      }
+      if (filter.featureParking && !isFeatureTurnedOn(post.offer.features, filter.featureParking)) {
+        return false;
+      }
+      if (filter.featureWasher && !isFeatureTurnedOn(post.offer.features, filter.featureWasher)) {
+        return false;
+      }
+      if (filter.featureElevator && !isFeatureTurnedOn(post.offer.features, filter.featureElevator)) {
+        return false;
+      }
+      if (filter.featureConditioner && !isFeatureTurnedOn(post.offer.features, filter.featureConditioner)) {
+        return false;
+      }
+
+      return true;
+    });
+
+    return posts;
+  };
+
   return {
     processPin: processPin,
     deactivatePins: deactivatePins,
     renderPins: renderPins,
-    removePins: removePins
+    removePins: removePins,
+    getFilteredPins: getFilteredPins
   };
 })();
