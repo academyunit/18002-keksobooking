@@ -5,6 +5,11 @@ window.util = (function () {
   var KEYBOARD_KEY_ESC = 27;
 
   /**
+   * Идентификатор таймаута debounce'a.
+   */
+  var lastTimeOut;
+
+  /**
    * Нажатие ENTER
    *
    * @param {Event} ev
@@ -168,6 +173,26 @@ window.util = (function () {
     }, milliseconds);
   };
 
+  /**
+   * Защита от любителей "играть на пианино" в фильтрах :)
+   *
+   * @param {Function} func
+   * @param {number} interval milliseconds
+   */
+  var debounce = function (func, interval) {
+    interval = interval || 500;
+    if (typeof func !== 'function') {
+      return;
+    }
+    if (lastTimeOut) {
+      window.clearTimeout(lastTimeOut);
+    }
+
+    lastTimeOut = window.setTimeout(function () {
+      func();
+    }, interval);
+  };
+
   return {
     isEnterKeyPressed: isEnterKeyPressed,
     isEscKeyPressed: isEscKeyPressed,
@@ -179,6 +204,7 @@ window.util = (function () {
     removeChildNodes: removeChildNodes,
     switchFieldsetsControls: toggleFieldsets,
     showForm: showForm,
-    showFlashMessage: showFlashMessage
+    showFlashMessage: showFlashMessage,
+    debounce: debounce
   };
 })();
