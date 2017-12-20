@@ -120,6 +120,21 @@ window.map = (function () {
   };
 
   /**
+   * Перерендерить пины с новыми фильтрами.
+   *
+   * @param {Event} ev
+   * @return {Function}
+   */
+  var rerenderPins = function (ev) {
+    // Сохраняем тут в замыкании наше событие
+    return function () {
+      window.pin.removePins(pinsContainer);
+      window.pin.renderPins(window.pin.getFilteredPins(ev));
+      registerPinsHandlers();
+    };
+  };
+
+  /**
    * Handler в случае успешного ответа.
    *
    * @param {Array} response
@@ -167,10 +182,8 @@ window.map = (function () {
     pinOnMouseDown(ev);
   });
 
-  pinFilters.addEventListener('change', function(ev) {
-    window.pin.removePins(pinsContainer);
-    window.pin.renderPins(window.pin.getFilteredPins(ev));
-    registerPinsHandlers();
+  pinFilters.addEventListener('change', function (ev) {
+    window.util.debounce(rerenderPins(ev));
   });
 
   return {

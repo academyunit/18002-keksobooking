@@ -2,16 +2,16 @@
 
 window.pin = (function () {
   var filter = {
-    housingType: null,
-    housingPrice: null,
-    housingRooms: null,
-    housingGuests: null,
-    featureWifi: null,
-    featureDishwasher: null,
-    featureParking: null,
-    featureWasher: null,
-    featureElevator: null,
-    featureConditioner: null
+    'housing-type': null,
+    'housing-price': null,
+    'housing-rooms': null,
+    'housing-guests': null,
+    'filter-wifi': null,
+    'filter-dishwasher': null,
+    'filter-parking': null,
+    'filter-washer': null,
+    'filter-elevator': null,
+    'filter-conditioner': null
   };
 
   /**
@@ -110,6 +110,12 @@ window.pin = (function () {
     activatePin(pin);
   };
 
+  /**
+   * Получить диапазон min/max по имени.
+   *
+   * @param {string} name
+   * @return {{min: number, max: number}}
+   */
   var getPriceRangeByName = function (name) {
     var min = 0;
     var max = 0;
@@ -137,6 +143,13 @@ window.pin = (function () {
     };
   };
 
+  /**
+   * Прайс находится в разрешенном диапазоне.
+   *
+   * @param {number} value price range name
+   * @param {number} price current price
+   * @return {boolean}
+   */
   var isHousingPriceWithingRange = function (value, price) {
     var priceRange = getPriceRangeByName(value);
     if (priceRange.min < 0 && priceRange.max < 0) {
@@ -149,83 +162,78 @@ window.pin = (function () {
     return (price >= priceRange.min && price <= priceRange.max);
   };
 
+  /**
+   * Фича включена?
+   *
+   * @param {Array} features An Массив с фичами
+   * @param {string} featureToCheck проверяемая фича
+   * @return {boolean}
+   */
   var isFeatureTurnedOn = function (features, featureToCheck) {
     return features.indexOf(featureToCheck) > -1;
   };
 
+  /**
+   * Отфильтровать пины по критериям.
+   *
+   * @param {Event} ev
+   * @return {Array}
+   */
   var getFilteredPins = function (ev) {
     var target = ev.target;
     var value = target.value;
 
     var posts = window.data.getPosts();
 
-    if (target.id == 'housing-type') {
-      filter.housingType = value == 'any' ? null : value;
-    }
-    if (target.id == 'housing-price') {
-      filter.housingPrice = value == 'any' ? null : value;
-    }
-    if (target.id == 'housing-rooms') {
-      filter.housingRooms = value == 'any' ? null : value;
-    }
-    if (target.id == 'housing-guests') {
-      filter.housingGuests = value == 'any' ? null : value;
-    }
-    if (target.id == 'filter-wifi') {
-      filter.featureWifi = target.checked ? value : null;
-    }
-    if (target.id == 'filter-dishwasher') {
-      filter.featureDishwasher = target.checked ? value : null;
-    }
-    if (target.id == 'filter-parking') {
-      filter.featureParking = target.checked ? value : null;
-    }
-    if (target.id == 'filter-washer') {
-      filter.featureWasher = target.checked ? value : null;
-    }
-    if (target.id == 'filter-elevator') {
-      filter.featureElevator = target.checked ? value : null;
-    }
-    if (target.id == 'filter-conditioner') {
-      filter.featureConditioner = target.checked ? value : null;
+    for (var key in filter) {
+      if (!filter.hasOwnProperty(key)) {
+        continue;
+      }
+      if (target.id !== key) {
+        continue;
+      }
+      // для селектов
+      if (target.type === 'select-one') {
+        filter[key] = value === 'any' ? null : value;
+      }
+      // для чекбоксов
+      if (target.type === 'checkbox') {
+        filter[key] = target.checked ? value : null;
+      }
     }
 
-    posts = posts.filter(function(post) {
-      if (filter.housingType && post.offer.type !== filter.housingType) {
-        return false;
-      }
-      if (filter.housingRooms && post.offer.rooms !== parseInt(filter.housingRooms)) {
-        return false;
-      }
-      if (filter.housingPrice && !isHousingPriceWithingRange(filter.housingPrice, post.offer.price)) {
-        return false;
-      }
-      if (filter.housingGuests && post.offer.guests !== parseInt(filter.housingGuests)) {
-        return false;
-      }
-      if (filter.featureWifi && !isFeatureTurnedOn(post.offer.features, filter.featureWifi)) {
-        return false;
-      }
-      if (filter.featureDishwasher && !isFeatureTurnedOn(post.offer.features, filter.featureDishwasher)) {
-        return false;
-      }
-      if (filter.featureParking && !isFeatureTurnedOn(post.offer.features, filter.featureParking)) {
-        return false;
-      }
-      if (filter.featureWasher && !isFeatureTurnedOn(post.offer.features, filter.featureWasher)) {
-        return false;
-      }
-      if (filter.featureElevator && !isFeatureTurnedOn(post.offer.features, filter.featureElevator)) {
-        return false;
-      }
-      if (filter.featureConditioner && !isFeatureTurnedOn(post.offer.features, filter.featureConditioner)) {
-        return false;
+    return posts.filter(function (post) {
+      for (var filterName in filter) {
+        if (!filter.hasOwnProperty(filterName)) {
+          continue;
+        }
+        var filterValue = filter[filterName];
+        if (!filterValue) {
+          continue;
+        }
+        // Фильтруем по чекбоксам
+        if (filterName.indexOf('filter-') > -1 && !isFeatureTurnedOn(post.offer.features, filterValue)) {
+          return false;
+        }
+        // Фильтруем по обычным селектовским фильтрам
+        if (filterName.indexOf('housing-') > -1) {
+          if (filterName === 'housing-type' && post.offer.type !== filterValue) {
+            return false;
+          }
+          if (filterName === 'housing-rooms' && post.offer.rooms !== parseInt(filterValue, 10)) {
+            return false;
+          }
+          if (filterName === 'housing-guests' && post.offer.guests !== parseInt(filterValue, 10)) {
+            return false;
+          }
+          if (filterName === 'housing-price' && !isHousingPriceWithingRange(filterValue, post.offer.price)) {
+            return false;
+          }
+        }
       }
 
       return true;
     });
-
-    return posts;
   };
 
   return {
