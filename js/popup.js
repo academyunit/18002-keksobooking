@@ -22,9 +22,6 @@ window.popupWindow = (function () {
    */
   var keyDownHandler = function (ev) {
     if (window.util.isEscKeyPressed(ev)) {
-      /**
-       * @todo: есть ли какой способ лучше это сделать?
-       */
       window.popupWindow.removePopups(window.map.mapContainer);
       window.pin.deactivatePins(window.map.pinsContainer.children);
     }
@@ -60,7 +57,6 @@ window.popupWindow = (function () {
    * Handler закрытия попапа.
    */
   var popUpCloseHandler = function () {
-    // @todo: что думаешь по поводу этого ? :)
     window.popupWindow.removePopups(window.map.mapContainer);
     window.pin.deactivatePins(window.map.pinsContainer.children);
   };

@@ -1,7 +1,10 @@
 'use strict';
 
 window.data = (function () {
-  /** Массив сгенерированных постов */
+  /** Кол-во сущностей, выдаваемых за раз. */
+  var MAX_ITEMS_LIMIT = 5;
+
+  /** Массив сгенерированных постов. */
   var posts = [];
 
   /**
@@ -21,7 +24,10 @@ window.data = (function () {
    * @return {Array}
    */
   var getPosts = function () {
-    return posts.slice();
+    var copy = posts.slice();
+    limitItems(copy);
+
+    return copy;
   };
 
   /**
@@ -38,6 +44,20 @@ window.data = (function () {
     }
 
     return null;
+  };
+
+  /**
+   * Ограничить количество выдаыаемой информации.
+   *
+   * @param {Array} items
+   * @param {number} limit
+   */
+  var limitItems = function (items, limit) {
+    limit = limit || MAX_ITEMS_LIMIT;
+    if (items.length < limit) {
+      return;
+    }
+    items.splice(limit, items.length - 1);
   };
 
   return {

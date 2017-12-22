@@ -30,60 +30,6 @@ window.util = (function () {
   };
 
   /**
-   * Получить случайный элемент массива
-   *
-   * @param {Array} arr
-   * @return {string}
-   */
-  var getRandomArrayElement = function (arr) {
-    return arr[getRandomArrayIndex(arr)];
-  };
-
-  /**
-   * Получить случайный индекс
-   *
-   * @param {Array} arr
-   * @return {number}
-   */
-  var getRandomArrayIndex = function (arr) {
-    return Math.floor(Math.random() * arr.length);
-  };
-
-  /**
-   * Получить случайное число
-   *
-   * @param {number} max
-   * @param {number} min
-   * @return {number}
-   */
-  var getRandom = function (max, min) {
-    min = min || 0;
-    return Math.floor(Math.random() * (max - min) + min);
-  };
-
-  /**
-   * Перемешать массив.
-   *
-   * @param {Array} arr
-   * @return {Array}
-   */
-  var shuffleArray = function (arr) {
-    return arr.sort(function () {
-      return 0.5 - Math.random();
-    });
-  };
-
-  /**
-   * Получить случайный уникальный элемент массива.
-   *
-   * @param {Array} arr Массив элементов
-   * @return {string}
-   */
-  var getRandomUniqueValue = function (arr) {
-    return shuffleArray(arr).pop();
-  };
-
-  /**
    * Удалить все дочерние элементы у DOM ноды.
    *
    * @param {Element} node Текущая нода, у которой нужно удалить children'ов
@@ -196,11 +142,6 @@ window.util = (function () {
   return {
     isEnterKeyPressed: isEnterKeyPressed,
     isEscKeyPressed: isEscKeyPressed,
-    getRandomArrayElement: getRandomArrayElement,
-    getRandomArrayIndex: getRandomArrayIndex,
-    getRandom: getRandom,
-    shuffleArray: shuffleArray,
-    getRandomUniqueValue: getRandomUniqueValue,
     removeChildNodes: removeChildNodes,
     switchFieldsetsControls: toggleFieldsets,
     showForm: showForm,

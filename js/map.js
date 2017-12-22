@@ -39,10 +39,29 @@ window.map = (function () {
   };
 
   /**
+   * Активация карты и формы при первом нажатии на пин.
+   */
+  var onFirstMouseDown = function () {
+    // Включить инпуты в форме
+    window.util.switchFieldsetsControls(form);
+    // Активировать карту
+    showMap();
+    // Удаляем старые Pin'ы
+    window.pin.removePins(pinsContainer);
+    // Показать метки похожих объявлений
+    window.pin.renderPins(window.data.getPosts());
+    registerPinsHandlers();
+    // Активировать форму
+    window.util.showForm(form);
+
+    pinMain.removeEventListener('mousedown', onFirstMouseDown);
+  };
+
+  /**
    * Кнопка нажата
    * @param {Event} ev
    */
-  var pinOnMouseDown = function (ev) {
+  var onMouseDown = function (ev) {
     ev.preventDefault();
 
     var startCoordinates = {
@@ -101,7 +120,7 @@ window.map = (function () {
   };
 
   /**
-   * @todo: здесь ли ему место? Или где лучше?
+   * Обработчики пинов.
    */
   var registerPinsHandlers = function () {
     var pinsList = Array.prototype.slice.call(mapContainer.querySelectorAll('.map__pin'));
@@ -166,21 +185,8 @@ window.map = (function () {
   window.offerForm.initSync();
 
   // Инициализация собыйтий и интерфейса карты по нажатию на красный маркер
-  pinMain.addEventListener('mousedown', function (ev) {
-    // Включить инпуты в форме
-    window.util.switchFieldsetsControls(form);
-    // Активировать карту
-    showMap();
-    // Удаляем старые Pin'ы
-    window.pin.removePins(pinsContainer);
-    // Показать метки похожих объявлений
-    window.pin.renderPins(window.data.getPosts());
-    registerPinsHandlers();
-    // Активировать форму
-    window.util.showForm(form);
-
-    pinOnMouseDown(ev);
-  });
+  pinMain.addEventListener('mousedown', onFirstMouseDown);
+  pinMain.addEventListener('mousedown', onMouseDown);
 
   pinFilters.addEventListener('change', function (ev) {
     window.util.debounce(rerenderPins(ev));

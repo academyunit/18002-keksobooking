@@ -56,9 +56,10 @@ window.pin = (function () {
   var renderPins = function (pins) {
     var pinContainer = document.querySelector('.map__pins');
     var fragment = document.createDocumentFragment();
-    for (var i = 0; i < pins.length; i++) {
-      fragment.appendChild(getPinButton(pins[i]));
-    }
+
+    pins.forEach(function (pin) {
+      fragment.appendChild(getPinButton(pin));
+    });
 
     pinContainer.appendChild(fragment);
   };
@@ -66,13 +67,12 @@ window.pin = (function () {
   /**
    * Выключить подсветку для Pin.
    *
-   * @param {Element} pin
+   * @param {Element} pinNodes
    */
-  var deactivatePin = function (pin) {
-    if (!pin.classList.contains('map__pin')) {
-      return;
+  var deactivatePin = function (pinNodes) {
+    if (pinNodes.classList.contains('map__pin')) {
+      pinNodes.classList.remove('map__pin--active');
     }
-    pin.classList.remove('map__pin--active');
   };
 
   /**
@@ -101,13 +101,8 @@ window.pin = (function () {
    * @param {Event} ev
    */
   var processPin = function (ev) {
-    var pin = ev.currentTarget;
-    // Деактивировать все ранее активированные Pin'ы
-    /**
-     * @todo: есть ли какой способ лучше это сделать?
-     */
     deactivatePins(window.map.pinsContainer.children);
-    activatePin(pin);
+    activatePin(ev.currentTarget);
   };
 
   /**
@@ -159,7 +154,7 @@ window.pin = (function () {
       return true;
     }
 
-    return (price >= priceRange.min && price <= priceRange.max);
+    return price >= priceRange.min && price <= priceRange.max;
   };
 
   /**
@@ -179,7 +174,7 @@ window.pin = (function () {
    * @param {Event} ev
    * @return {Array}
    */
-  var getFilteredPins = function (ev) {
+  var getFilteredPosts = function (ev) {
     var target = ev.target;
     var value = target.value;
 
@@ -241,6 +236,6 @@ window.pin = (function () {
     deactivatePins: deactivatePins,
     renderPins: renderPins,
     removePins: removePins,
-    getFilteredPins: getFilteredPins
+    getFilteredPins: getFilteredPosts
   };
 })();

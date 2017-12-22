@@ -38,8 +38,8 @@ window.offerForm = (function () {
       });
     });
 
-    form.addEventListener('invalid', function (e) {
-      var fieldName = e.target.name;
+    form.addEventListener('invalid', function (ev) {
+      var fieldName = ev.target.name;
 
       switch (fieldName) {
         case 'price':

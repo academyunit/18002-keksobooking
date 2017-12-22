@@ -36,7 +36,7 @@ window.card = (function () {
    * @return {string}
    */
   var getFormattedPrice = function (number) {
-    return (number).toLocaleString('ru-RU', {
+    return number.toLocaleString('ru-RU', {
       style: 'currency',
       currency: 'RUB'
     }) + '/ночь';
@@ -50,12 +50,12 @@ window.card = (function () {
    */
   var getFeaturesList = function (featuresList) {
     var fragment = document.createDocumentFragment();
-    for (var i = 0; i < featuresList.length; i++) {
-      var feature = document.createElement('li');
-      feature.className = 'feature feature--' + featuresList[i];
+    featuresList.forEach(function (feature) {
+      var element = document.createElement('li');
+      element.className = 'feature feature--' + feature;
 
-      fragment.appendChild(feature);
-    }
+      fragment.appendChild(element);
+    });
 
     return fragment;
   };
@@ -93,6 +93,7 @@ window.card = (function () {
     var featuresList = post.querySelector('.popup__features');
     var description = post.querySelector('.popup__features + p');
     var userAvatar = post.querySelector('.popup__avatar');
+    var pictures = post.querySelector('.popup__pictures');
 
     var typeName = APARTMENT_TYPE[data.offer.type] || 'Тип жилья неизвестен';
 
@@ -105,6 +106,8 @@ window.card = (function () {
     processFeatures(featuresList, data.offer.features);
     description.textContent = data.offer.description;
     userAvatar.src = data.author.avatar;
+
+    post.removeChild(pictures);
 
     return post;
   };
