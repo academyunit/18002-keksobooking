@@ -183,6 +183,7 @@ window.map = (function () {
   // Инициализация обработчиков формы
   window.offerForm.initValidators();
   window.offerForm.initSync();
+  window.offerForm.initUploader();
 
   // Инициализация собыйтий и интерфейса карты по нажатию на красный маркер
   pinMain.addEventListener('mousedown', onFirstMouseDown);

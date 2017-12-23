@@ -162,6 +162,22 @@ window.offerForm = (function () {
   };
 
   /**
+   * Загрузка фотографий с предпросмотром.
+   */
+  var initUploader = function () {
+    window.uploader.register({
+      mode: window.uploader.UPLOADING_MODES.singleFileUpload,
+      browseButton: '.notice__photo input[type="file"]',
+      targetContainer: '.notice__preview img'
+    });
+    window.uploader.register({
+      mode: window.uploader.UPLOADING_MODES.multiFilesUpload,
+      browseButton: '.form__photo-container input[type="file"]',
+      targetContainer: '.form__photo-container'
+    });
+  };
+
+  /**
    * Обновить адрес в форме.
    *
    * @param {number} x
@@ -174,6 +190,7 @@ window.offerForm = (function () {
   return {
     initValidators: initValidators,
     initSync: initSync,
+    initUploader: initUploader,
     setAddress: setAddress
   };
 })();
