@@ -36,7 +36,7 @@ window.uploader = (function () {
     /**
      * Проверка на соответствие файла разрешенному extension'y.
      *
-     * @param {string }fileName
+     * @param {string} fileName
      * @return {boolean}
      */
     var hasValidExtension = function (fileName) {
@@ -98,7 +98,7 @@ window.uploader = (function () {
     /**
      * Вставить новую Dom ноду с картинкой в DOM.
      *
-     * @param {string }encodedImage
+     * @param {string} encodedImage
      */
     var behaviorAttachNewNodeToDom = function (encodedImage) {
       targetContainer.appendChild(getGeneratedImageNode(encodedImage));
