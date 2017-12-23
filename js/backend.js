@@ -1,19 +1,31 @@
 'use strict';
 
 window.backend = (function () {
+  /** Адреса API сервера (для загрузки и отправления данных). */
+  var URL = 'https://js.dump.academy/keksobooking';
+  /** Макисмальный timeout ожидания. */
   var TIMEOUT_MAX_TIME = 10000;
+  /** Получаемый тип данных по-умолчанию. */
   var DEFAULT_RESPONSE_TYPE = 'json';
+
+  /**
+   * Адрес для загрузки данных.
+   *
+   * @return {string}
+   */
+  var getDataUrl = function () {
+    return URL + '/data';
+  };
 
   /**
    * Получить данные GET'ом с сервера.
    *
-   * @param {String} url
    * @param {Function} onSuccess
    * @param {Function} onError
    */
-  var load = function (url, onSuccess, onError) {
+  var load = function (onSuccess, onError) {
     sendRequest({
-      url: url,
+      url: getDataUrl(),
       onSuccess: onSuccess,
       onError: onError
     });
@@ -28,7 +40,7 @@ window.backend = (function () {
    */
   var save = function (data, onLoad, onError) {
     sendRequest({
-      url: 'https://1510.dump.academy/keksobooking',
+      url: URL,
       data: data,
       onSuccess: onLoad,
       onError: onError

@@ -32,6 +32,8 @@ window.offerForm = (function () {
       ev.preventDefault();
 
       window.backend.save(new FormData(form), function () {
+        form.reset();
+        initSync();
         window.util.showFlashMessage('Форма отправлена. Спасибо!');
       }, function (error) {
         window.util.showFlashMessage('Ошибка отправки формы! ' + error, false);

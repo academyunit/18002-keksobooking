@@ -1,6 +1,26 @@
 'use strict';
 
 window.pin = (function () {
+  /** Ценовые категории и их диапазоны. */
+  var SELECTED_RANGES = {
+    low: {
+      min: 0,
+      max: 10000
+    },
+    middle: {
+      min: 10000,
+      max: 50000
+    },
+    high: {
+      min: 50000,
+      max: -1
+    },
+    any: {
+      min: -1,
+      max: -1
+    }
+  };
+
   var filter = {
     'housing-type': null,
     'housing-price': null,
@@ -112,30 +132,11 @@ window.pin = (function () {
    * @return {{min: number, max: number}}
    */
   var getPriceRangeByName = function (name) {
-    var min = 0;
-    var max = 0;
-    switch (name) {
-      case 'middle':
-        min = 10000;
-        max = 50000;
-        break;
-      case 'low':
-        min = 0;
-        max = 10000;
-        break;
-      case 'high':
-        min = 50000;
-        max = -1;
-        break;
-      default:
-        min = -1;
-        max = -1;
+    var selectedRange = SELECTED_RANGES[name];
+    if (!selectedRange) {
+      return SELECTED_RANGES['any'];
     }
-
-    return {
-      min: min,
-      max: max
-    };
+    return selectedRange;
   };
 
   /**

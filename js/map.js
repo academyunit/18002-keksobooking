@@ -173,7 +173,7 @@ window.map = (function () {
   };
 
   // Грузим данные с бэкэнда
-  window.backend.load('https://1510.dump.academy/keksobooking/data', onSuccess, function (error) {
+  window.backend.load(onSuccess, function (error) {
     window.util.showFlashMessage(error, true);
   });
 
